@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# old nested repo, preserved (history kept, not tracked)
+algofinder/.git-embedded-history/

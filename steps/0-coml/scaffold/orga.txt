@@ -1,0 +1,632 @@
+Yes — with your definition of **hybrid pipeline**, the missing high-level pieces are mostly around **interfaces, guarantees, evidence, and reproducibility**.
+
+I would think of the whole program as needing these abstract components:
+
+## 1. Problem layer
+
+You already have “declare new CO problems,” but this should be its own high-level piece.
+
+A problem declaration should include:
+
+```text
+instance type
+solution type
+objective
+constraints / feasibility predicate
+verifier
+known bounds or certificates
+canonical encodings
+instance distributions
+```
+
+This layer answers:
+
+> What is the mathematical object being solved, and how do we know a proposed answer is valid?
+
+This is separate from solvers, ML, or data.
+
+---
+
+## 2. Instance/data layer
+
+You mentioned synthetic data generation, but I would make this broader.
+
+You need an **instance management layer**:
+
+```text
+synthetic instance generators
+real benchmark loaders
+train/validation/test splits
+out-of-distribution test sets
+instance metadata
+instance difficulty labels
+instance transformations
+instance families / subfamilies
+```
+
+The important abstraction is not just “data generation,” but:
+
+> What distribution of CO instances are we studying?
+
+For ML-infused CO, this is central. A model is almost never good for “TSP in general.” It is good for some distribution of TSP-like instances.
+
+---
+
+## 3. Representation/formulation layer
+
+This is a big missing piece.
+
+The same problem instance may be represented as:
+
+```text
+MILP
+CP-SAT model
+SAT/MaxSAT instance
+graph
+hypergraph
+bipartite variable-constraint graph
+local-search state space
+dynamic programming recurrence
+custom solver-native object
+```
+
+This layer answers:
+
+> How is the abstract problem translated into something solvers and ML models can consume?
+
+This should be separate from the problem itself.
+
+For example, “knapsack” is the problem. But it may have a MILP formulation, a DP formulation, a graph representation, and a neural feature representation.
+
+---
+
+## 4. Solver backend layer
+
+You mentioned solving pipelines, but you probably also need a lower-level abstraction for solver backends.
+
+Examples:
+
+```text
+exact MILP solver
+CP solver
+SAT solver
+local search solver
+large neighborhood search solver
+branch-and-bound solver
+dynamic programming solver
+metaheuristic solver
+custom research solver
+```
+
+This layer answers:
+
+> What computational engine is being controlled?
+
+The hybrid pipeline intervenes in the solver, but the solver itself should be a separate abstraction.
+
+---
+
+## 5. Intervention layer
+
+This is basically your definition of hybrid pipeline, but I would still split it out conceptually.
+
+A hybrid pipeline is a composition of interventions.
+
+An intervention has:
+
+```text
+decision point
+observation interface
+action interface
+policy/model
+fallback behavior
+legality constraints
+latency budget
+evaluation protocol
+distributional assumptions
+```
+
+Examples:
+
+```text
+branching intervention
+cut-selection intervention
+node-selection intervention
+repair intervention
+neighborhood-selection intervention
+decomposition intervention
+solver-configuration intervention
+portfolio-selection intervention
+```
+
+This is the “ML-infused” core.
+
+---
+
+## 6. Policy/model layer
+
+You already mention ML models, but I would use the more general word **policy**.
+
+A policy may be:
+
+```text
+learned neural model
+tree model
+ranking model
+ bandit
+reinforcement learning policy
+hand-coded heuristic
+oracle/expert policy
+random baseline
+solver default
+agentic policy
+```
+
+This matters because you want to compare ML against non-ML and expert policies under the same interface.
+
+So instead of only:
+
+```text
+MLModel
+```
+
+you probably want:
+
+```text
+Policy
+```
+
+where ML models are one kind of policy.
+
+---
+
+## 7. Training layer
+
+You already mentioned training and validating ML models, but the missing abstraction is:
+
+> Where do the labels/rewards come from?
+
+Training data may come from:
+
+```text
+optimal solutions
+solver traces
+expert heuristics
+strong branching
+rollouts
+self-play
+simulation
+human labels
+offline logs
+online interaction
+```
+
+So the training layer should know about:
+
+```text
+supervised learning
+imitation learning
+reinforcement learning
+offline RL
+ranking losses
+contrastive learning
+self-supervised pretraining
+curriculum learning
+```
+
+The most important object may be a **trace-derived dataset**.
+
+---
+
+## 8. Trace/trajectory layer
+
+This is one of the most important missing pieces.
+
+Do not just store final results. Store solver trajectories.
+
+A trace contains:
+
+```text
+states observed
+actions available
+action chosen
+model scores
+fallback choices
+bounds over time
+incumbents over time
+nodes explored
+cuts generated
+inference time
+solver time
+errors
+random seeds
+```
+
+This layer answers:
+
+> What actually happened during the solve?
+
+Without traces, you cannot debug, train from experience, or do serious science.
+
+---
+
+## 9. Verification/certification layer
+
+This is different from evaluation.
+
+Evaluation asks:
+
+> Was it good?
+
+Verification asks:
+
+> Was it valid?
+
+Certification asks:
+
+> What can we prove?
+
+You need to distinguish:
+
+```text
+feasible solution
+infeasible solution
+optimal solution
+proven infeasible instance
+bounded suboptimal solution
+timeout with incumbent
+timeout without incumbent
+numerical failure
+unsafe ML decision
+invalid solver state
+```
+
+This is especially important because some ML interventions preserve exactness, while others destroy it.
+
+For example:
+
+```text
+ML chooses branch variable → exactness preserved
+ML suggests incumbent → exactness preserved if checked
+ML prunes nodes → exactness may be destroyed
+ML fixes variables → exactness may be destroyed unless certified
+```
+
+So each pipeline should declare its **guarantee type**.
+
+---
+
+## 10. Evaluation/benchmark layer
+
+You mentioned validating against benchmark data, but I would make this an explicit high-level component.
+
+It should define:
+
+```text
+metrics
+baselines
+benchmark suites
+time limits
+hardware assumptions
+statistical tests
+aggregation rules
+report format
+leaderboards
+OOD tests
+scaling tests
+ablation tests
+```
+
+Important metrics include:
+
+```text
+objective value
+optimality gap
+time to solution
+time to proof
+primal integral
+dual integral
+nodes explored
+solution feasibility
+memory use
+inference overhead
+robustness
+failure rate
+```
+
+This layer answers:
+
+> Did this pipeline actually improve anything, compared to what?
+
+---
+
+## 11. Experiment layer
+
+This is distinct from storage and evaluation.
+
+An experiment specifies:
+
+```text
+problem
+instance distribution
+formulation
+solver backend
+intervention points
+policies/models
+training protocol
+evaluation protocol
+baselines
+random seeds
+resource budget
+hardware
+```
+
+This is the thing you should be able to rerun.
+
+The core object might be:
+
+```text
+ExperimentSpec
+```
+
+This is probably more important than `main.py`.
+
+---
+
+## 12. Reproducibility/artifact layer
+
+Your DBMS stores things, but you also need an abstract reproducibility layer.
+
+It tracks:
+
+```text
+config hashes
+dataset versions
+instance generator versions
+model checkpoints
+solver versions
+code version
+feature extractor version
+random seeds
+hardware information
+environment/dependencies
+```
+
+This layer answers:
+
+> Can I reproduce this result six months later?
+
+The DBMS is the storage mechanism. Reproducibility is the conceptual responsibility.
+
+---
+
+## 13. Feature/observation layer
+
+Because your interventions depend on observations, you need a high-level piece that defines feature extraction.
+
+Examples:
+
+```text
+problem-level features
+instance-level features
+solver-state features
+candidate-action features
+graph features
+LP relaxation features
+incumbent-solution features
+constraint features
+variable features
+route/job/customer features
+```
+
+This layer answers:
+
+> What does the policy see?
+
+This should be versioned. Changing the feature extractor changes the experiment.
+
+---
+
+## 14. Action/legality layer
+
+Likewise, every policy needs an action abstraction.
+
+Examples:
+
+```text
+choose variable
+choose value
+choose node
+choose cut
+choose neighborhood
+choose solver parameter
+choose subproblem
+choose repair move
+choose route modification
+choose restart
+```
+
+But the system also needs legality masks:
+
+```text
+which variables are branchable?
+which cuts are currently valid?
+which moves preserve feasibility?
+which neighborhoods are allowed?
+which solver parameters may be changed online?
+```
+
+This layer answers:
+
+> What is the policy allowed to do right now?
+
+This is especially important for agentic interventions.
+
+---
+
+## 15. Fallback/safety layer
+
+You included fallback behavior inside hybrid pipelines, but I would still make this a system-wide abstraction.
+
+Fallbacks include:
+
+```text
+use solver default
+use classical heuristic
+reject invalid action
+clip to legal action
+ask exact solver to repair
+terminate intervention
+disable model after repeated failures
+switch to robust baseline
+```
+
+This layer answers:
+
+> How does the system fail safely?
+
+For research, this is also useful because you can compare:
+
+```text
+ML alone
+ML with fallback
+fallback alone
+solver default
+```
+
+---
+
+## 16. Agentic harness layer
+
+You already have this, but I would define it abstractly as a controlled intervention system.
+
+An agent should have:
+
+```text
+role
+observable state
+allowed tools/actions
+budget
+memory
+validation checks
+rollback protocol
+audit log
+```
+
+Possible agent roles:
+
+```text
+formulation agent
+solver-configuration agent
+neighborhood-design agent
+repair agent
+benchmark-analysis agent
+experiment-design agent
+decomposition agent
+debugging agent
+```
+
+The agentic harness should not be a magical free-for-all. It should be a constrained policy layer with tool permissions and validation.
+
+---
+
+## 17. Registry/plugin layer
+
+This is easy to overlook.
+
+If the goal is to make it easy to declare new problems, solvers, models, interventions, datasets, and metrics, you need a registry system.
+
+It should register:
+
+```text
+problem families
+instance generators
+benchmark loaders
+formulations
+solver backends
+intervention points
+policies
+models
+feature extractors
+metrics
+training protocols
+evaluation protocols
+agents
+reports
+```
+
+This is the thing that makes the program extensible.
+
+---
+
+## 18. Reporting/analysis layer
+
+You mentioned reports, but I would treat reporting as an abstract system component.
+
+It should produce:
+
+```text
+single-run reports
+benchmark comparison reports
+ablation reports
+OOD generalization reports
+failure analysis reports
+trace visualizations
+learning curves
+solver-performance profiles
+cost-vs-quality plots
+```
+
+This layer answers:
+
+> What did we learn?
+
+Without this, you will have a database full of results but no research workflow.
+
+---
+
+# Condensed version
+
+If I compress the architecture, I would say the high-level pieces are:
+
+```text
+1. Problem layer
+2. Instance/distribution layer
+3. Representation/formulation layer
+4. Solver backend layer
+5. Intervention/hybrid-pipeline layer
+6. Policy/model layer
+7. Training-data/learning layer
+8. Feature/observation layer
+9. Action/legality layer
+10. Trace/trajectory layer
+11. Verification/certification layer
+12. Evaluation/benchmark layer
+13. Experiment orchestration layer
+14. Reproducibility/artifact layer
+15. Storage/DBMS layer
+16. Agentic harness layer
+17. Registry/plugin layer
+18. Reporting/analysis layer
+```
+
+Your original list already covers parts of 1, 5, 6, 7, 13, 15, and 16.
+
+The pieces I think you were most clearly missing are:
+
+```text
+representation/formulation layer
+trace/trajectory layer
+verification/certification layer
+feature/observation layer
+action/legality layer
+experiment/reproducibility layer
+registry/plugin layer
+```
+
+The most important conceptual correction is:
+
+> The program should not be centered on “problems, models, and pipelines.”
+> It should be centered on “problems, solvers, decision points, policies, traces, and evidence.”
+
+That framing makes the system much more suitable for ML-infused combinatorial optimization.

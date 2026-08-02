@@ -1,0 +1,89 @@
+# # this project is about developing/researching ml for combinatorial optimization and combinatorial optimization for ml
+# # creating a new venv:
+# # to create a new venv with name coml, run the following command:
+# # python -m venv coml
+# # to activate the venv, run the following command:
+# # source coml/bin/activate
+# # to deactivate the venv, run the following command:
+# # deactivate
+# # to install the dependencies, run the following command:
+# # pip install -r requirements.txt
+# # to run the project, run the following command:
+
+
+# # we will use the following libraries:
+# # - numpy
+# # - pandas
+# # - matplotlib
+# # - scikit-learn
+# # - scipy
+# # - tensorflow
+# # - chainer
+# # - mxnet
+# # - theano  
+# # to install the dependencies, run the following command:
+# # pip install -r requirements.txt
+
+
+# import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import sklearn as sklearn
+# import scipy as scipy
+# import tensorflow as tf
+# import keras as keras
+# import torch as torch
+# import chainer as chainer
+# import mxnet as mxnet
+# import theano as theano 
+
+# # we will use the following datasets for testing:
+# # - the knapsack problem
+# # - the traveling salesman problem
+# # - the job scheduling problem
+# # - the vehicle routing problem
+# # - the knapsack problem
+# # - the traveling salesman problem
+# # - the job scheduling problem
+# # - the vehicle routing problem
+
+
+# def main():
+#     print("Hello, World!")
+
+# if __name__ == "__main__":
+#     main()  
+
+
+# this is the requirements.txt file for the project
+# these modules do the following:
+# - numpy: numerical computing
+# - pandas: data manipulation and analysis
+# - matplotlib: data visualization
+# - scikit-learn: machine learning
+# - scipy: scientific computing
+# - chainer: deep learning framework
+# - mxnet: deep learning framework
+# - theano: deep learning framework
+# and these are the optimization libraries:
+# - scipy: optimization
+# - cvxpy: optimization
+# - gurobipy: optimization
+# - pyomo: optimization
+# - pyscipopt: optimization
+# - pyoptsparse: optimization
+
+
+numpy
+pandas
+matplotlib
+scikit-learn
+scipy
+# chainer
+# mxnet
+# theano
+# cvxpy
+# gurobipy
+# pyomo
+# pyscipopt
+# pyoptsparse
