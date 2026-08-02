@@ -3,8 +3,8 @@ import random
 
 import numpy as np
 
-from stem4humanity.problems.scheduling import JobShopState
-from stem4humanity.solvers.scheduling.jobshop_bnb import JobShopBnBExactSolver, simulate_makespan
+from algofinder.problems.scheduling import JobShopState
+from algofinder.solvers.scheduling.jobshop_bnb import JobShopBnBExactSolver, simulate_makespan
 
 
 def correct_makespan(state, orders):

@@ -26,7 +26,7 @@
 #  it.  Nothing else needs to change.
 #
 #  Usage:
-#      python -m stem4humanity.harness.runner --config config/config.toml benchmark
+#      python -m algofinder.harness.runner --config config/config.toml benchmark
 #
 # ============================================================================
 

@@ -1,8 +1,8 @@
 import random
 
-from stem4humanity.problems.shortest_path import ShortestPathState
-from stem4humanity.solvers.shortest_path.dijkstra import DijkstraSolver
-from stem4humanity.solvers.shortest_path.learned_pruner import LearnedArcPruningSolver
+from algofinder.problems.shortest_path import ShortestPathState
+from algofinder.solvers.shortest_path.dijkstra import DijkstraSolver
+from algofinder.solvers.shortest_path.learned_pruner import LearnedArcPruningSolver
 
 
 def random_dag(rng):

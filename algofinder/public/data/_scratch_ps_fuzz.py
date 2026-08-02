@@ -2,8 +2,8 @@ import random
 
 import numpy as np
 
-from stem4humanity.problems.parallel_scheduling import ParallelSchedulingState
-from stem4humanity.solvers.parallel_scheduling.exact import PSExactSolver
+from algofinder.problems.parallel_scheduling import ParallelSchedulingState
+from algofinder.solvers.parallel_scheduling.exact import PSExactSolver
 
 
 def brute_force(state):
