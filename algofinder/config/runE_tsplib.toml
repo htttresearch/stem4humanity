@@ -1,0 +1,47 @@
+# run E — TSPLIB EUC_2D benchmark, all current TSP solvers
+# prod profile; certified integer optima; matched-time comparison
+profile = "prod"
+
+[profiles.dev]
+mode = "dev"
+
+[profiles.prod]
+mode = "prod"
+
+[paths]
+instances_dir = "../algofinder/data/instances"
+results_dir = "../outD/results"
+models_dir = "../outD/models"
+sessions_dir = "../outD/sessions"
+benchmark_out = "../outD/results/benchmark-tsplib.json"
+leaderboard_out = "../outD/results/leaderboard-tsplib.md"
+model_out = "../outD/models/candidate_ranker.joblib"
+
+[benchmark]
+budget_seconds = 5.0
+timeout_seconds = 60.0
+manifests = ["../algofinder/data/instances/tsp_tsplib_manifests.json"]
+splits = ["test"]
+solver_include = [
+    "chained-2opt-euclidean",
+    "strong-ils-euclidean",
+    "distance-ranked-2opt",
+    "general-2opt",
+    "held-karp",
+    "incremental-exact",
+    "learned-candidate-2opt",
+]
+
+[pipeline]
+steps = ["benchmark", "report"]
+
+[runtime]
+verbose = false
+
+[ml]
+n_estimators = 10
+max_depth = 4
+random_state = 1
+
+[instances]
+best_known_budget_seconds = 2.0
