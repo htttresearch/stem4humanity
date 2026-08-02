@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from stem4humanity.ml.bp_packer import BinPackingPacker
 
 DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "models" / "bp_packer.joblib"
+    Path(__file__).resolve().parents[3] / "public" / "models" / "bp_packer.joblib"
 )
 
 

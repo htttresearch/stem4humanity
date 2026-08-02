@@ -2,7 +2,7 @@
 
 ``prod`` mode (the default) never touches the filesystem beyond the
 results the harness writes; ``dev`` mode opens a timestamped session
-directory under ``data/sessions`` and lets individual solvers write
+directory under ``private/sessions`` and lets individual solvers write
 JSONL traces of their intermediate states as they run.
 
 Tracing is intentionally ad hoc for now: solvers opt in by calling
@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SESSIONS_ROOT = PROJECT_ROOT / "data" / "sessions"
+SESSIONS_ROOT = PROJECT_ROOT / "private" / "sessions"
 
 _trace_dir: Path | None = None
 

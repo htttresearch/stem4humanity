@@ -21,7 +21,7 @@ from stem4humanity.solvers.tsp.euclidean_local_search import solve_with_candidat
 if TYPE_CHECKING:
     from stem4humanity.ml.candidate_ranker import CandidateEdgeRanker
 
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parents[3] / "data" / "models" / "candidate_ranker.joblib"
+DEFAULT_MODEL_PATH = Path(__file__).resolve().parents[3] / "public" / "models" / "candidate_ranker.joblib"
 
 
 @register_solver

@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from stem4humanity.ml.sp_pruner import ShortestPathArcPruner
 
 DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "models" / "sp_pruner.joblib"
+    Path(__file__).resolve().parents[3] / "public" / "models" / "sp_pruner.joblib"
 )
 
 

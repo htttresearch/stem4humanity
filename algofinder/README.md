@@ -74,13 +74,13 @@ Every run happens in one of two universal modes:
   possible — no tracing, no extra I/O.
 - `--mode dev`: additionally record the intermediate states of the
   problem and of the solver while a solve is happening, into a
-  timestamped session directory `data/sessions/session-<timestamp>/`,
+  timestamped session directory `private/sessions/session-<timestamp>/`,
   one JSONL file per (instance, solver).
 
 Example:
 
 ```bash
-python -m stem4humanity.harness.runner benchmark --mode dev --manifest data/instances/uc_classic_manifest.json
+python -m stem4humanity.harness.runner benchmark --mode dev --manifest public/data/unit_commitment_classic_manifests.json
 ```
 
 Currently traced in dev mode (one JSONL per instance+solver):
@@ -105,11 +105,16 @@ The proposed universal replacement is specified in
 ## Data layout
 
 ```
-data/
-  instances/    generated manifests (JSON)
-  models/       trained models (joblib)
-  results/      benchmark.json + leaderboard.md
-  sessions/     dev-mode traces (JSONL), one dir per run
+public/               committed, published artifacts
+  data/               instance manifests (JSON)
+  models/             trained models (joblib)
+  results/            benchmark.json + leaderboard.md
+  benchmarks/         published benchmark suites (future)
+private/              gitignored, work-in-progress artifacts
+  data/               experimental/richer data packages
+  models/             unpublished models
+  results/            unpublished results
+  sessions/           dev-mode traces (JSONL), one dir per run
 ```
 
 ## Tests

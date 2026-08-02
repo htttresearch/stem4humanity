@@ -102,7 +102,11 @@ def generate_job_shop_instances(
     return records
 
 
-def generate_scheduling_manifests(output_dir: str = "data/instances") -> None:
+def generate_scheduling_manifests(
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
+) -> None:
     all_instances: list[Instance] = []
     for sizes in ((6, 10), (12, 18), (22, 28)):
         all_instances.extend(
@@ -132,7 +136,7 @@ def generate_scheduling_manifests(output_dir: str = "data/instances") -> None:
     flow_shops = [i for i in all_instances if i.subproblem == "flow-shop-2"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(flow_shops, exact, problem)
+        for instance in annotate_best_known(flow_shops, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances
@@ -142,7 +146,7 @@ def generate_scheduling_manifests(output_dir: str = "data/instances") -> None:
     job_shops = [i for i in all_instances if i.subproblem == "job-shop"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(job_shops, exact, problem)
+        for instance in annotate_best_known(job_shops, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances

@@ -49,7 +49,11 @@ def generate_general_instances(
     return records
 
 
-def generate_general_tsp_manifests(output_dir: str = "data/instances") -> None:
+def generate_general_tsp_manifests(
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
+) -> None:
     all_instances: list[Instance] = []
     all_instances.extend(
         generate_general_instances((9, 13), count=4, seed=3101, split="test")
@@ -60,5 +64,5 @@ def generate_general_tsp_manifests(output_dir: str = "data/instances") -> None:
 
     problem = get_problem("tsp")
     exact = next(s for s in all_solvers().values() if s.id == "incremental-exact")
-    all_instances = annotate_best_known(all_instances, exact, problem)
+    all_instances = annotate_best_known(all_instances, exact, problem, budget_seconds=best_known_budget_seconds)
     save_manifest(all_instances, f"{output_dir}/tsp_general_manifests.json")

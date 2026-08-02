@@ -68,7 +68,11 @@ def generate_shortest_path_instances(
     return records
 
 
-def generate_shortest_path_manifests(output_dir: str = "data/instances") -> None:
+def generate_shortest_path_manifests(
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
+) -> None:
     all_instances: list[Instance] = []
     for subproblem in ("general", "dag"):
         all_instances.extend(
@@ -89,5 +93,5 @@ def generate_shortest_path_manifests(output_dir: str = "data/instances") -> None
 
     problem = get_problem("shortest-path")
     exact = next(s for s in all_solvers().values() if s.id == "dijkstra")
-    all_instances = annotate_best_known(all_instances, exact, problem)
+    all_instances = annotate_best_known(all_instances, exact, problem, budget_seconds=best_known_budget_seconds)
     save_manifest(all_instances, f"{output_dir}/shortest_path_manifests.json")

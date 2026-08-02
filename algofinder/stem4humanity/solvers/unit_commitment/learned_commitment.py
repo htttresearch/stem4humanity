@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from stem4humanity.ml.uc_committer import UnitCommitmentLearner
 
 DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "models" / "uc_committer.joblib"
+    Path(__file__).resolve().parents[3] / "public" / "models" / "uc_committer.joblib"
 )
 
 

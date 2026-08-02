@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from stem4humanity.ml.uc_storage import StorageActionPredictor
 
 DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "models" / "uc_storage.joblib"
+    Path(__file__).resolve().parents[3] / "public" / "models" / "uc_storage.joblib"
 )
 
 

@@ -137,7 +137,9 @@ def generate_storage_instances(
 
 
 def generate_unit_commitment_manifests(
-    output_dir: str = "data/instances",
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
 ) -> None:
     classic_instances: list[Instance] = []
     for sizes in ((4, 4), (5, 5)):
@@ -163,13 +165,13 @@ def generate_unit_commitment_manifests(
         solver for solver in all_solvers().values() if solver.id == "uc-exact-dp"
     )
     classic_instances = list(
-        annotate_best_known(classic_instances, classic_exact, problem)
+        annotate_best_known(classic_instances, classic_exact, problem, budget_seconds=best_known_budget_seconds)
     )
     storage_exact = next(
         solver for solver in all_solvers().values() if solver.id == "uc-storage-dp"
     )
     storage_instances = list(
-        annotate_best_known(storage_instances, storage_exact, problem)
+        annotate_best_known(storage_instances, storage_exact, problem, budget_seconds=best_known_budget_seconds)
     )
 
     save_manifest(

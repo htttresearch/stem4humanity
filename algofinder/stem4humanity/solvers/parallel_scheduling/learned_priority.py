@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from stem4humanity.ml.ps_prioritizer import ParallelPriorityPredictor
 
 DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parents[3] / "data" / "models" / "ps_prioritizer.joblib"
+    Path(__file__).resolve().parents[3] / "public" / "models" / "ps_prioritizer.joblib"
 )
 
 

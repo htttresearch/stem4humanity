@@ -128,9 +128,10 @@ def generate_euclidean_instances(
 
 
 def generate_tsp_manifests(
-    output_dir: str = "data/instances",
+    output_dir: str = "public/data",
     *,
     opt_limit: int = 16,
+    best_known_budget_seconds: float | None = None,
 ) -> None:
     """Generate and save the full TSP instance set with exact best-known values."""
     test_sizes: list[tuple[int, int]] = [
@@ -158,7 +159,7 @@ def generate_tsp_manifests(
     small = [i for i in all_instances if len(i.data["points"]) <= opt_limit]
     problem = get_problem("tsp")
     exact = next(s for s in all_solvers().values() if s.id == "held-karp")
-    small = annotate_best_known(small, exact, problem)
+    small = annotate_best_known(small, exact, problem, budget_seconds=best_known_budget_seconds)
     annotated = {instance.name: instance for instance in small}
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances

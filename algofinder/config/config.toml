@@ -1,0 +1,201 @@
+# ============================================================================
+#  stem4humanity / algofinder — config & control layer
+# ============================================================================
+#
+#  This file is the single place to control how the harness runs.
+#
+#  How it works:
+#    * The `profile` key at the top selects WHICH profile (section below)
+#      is active.  Each profile is a complete, explained configuration.
+#    * Everything else is organized into shared sections ([paths],
+#      [benchmark], [pipeline], [runtime], [ml]) that apply to every
+#      profile.
+#    * Precedence: built-in defaults < this file < command-line flags.
+#      Any flag given on the command line wins over this file, e.g.
+#      `--timeout-seconds 60` overrides `timeout_seconds` here for that
+#      run only.
+#    * Relative paths in [paths] resolve against the project root when
+#      the default config file is used, and against the config file's
+#      own directory for any other config file (so scratch configs keep
+#      their outputs next to themselves).
+#    * Convention: 0 (or an empty list) means "off / unlimited / all" for
+#      knobs where that is a sensible value — each one says so below.
+#
+#  To add a new profile: copy one of the sections under [profiles] into a
+#  new [profiles.<name>] table, adjust the values, and point `profile` at
+#  it.  Nothing else needs to change.
+#
+#  Usage:
+#      python -m stem4humanity.harness.runner --config config/config.toml benchmark
+#
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+#  PROFILE SELECTOR — the single most important decision in this file
+# ----------------------------------------------------------------------------
+#  Which profile to run:
+#    "dev"  = full observability: every solver run is traced and recorded
+#             under the sessions directory (slower, inspectable, replayable)
+#    "prod" = no tracing at all: the harness runs as fast as possible
+profile = "dev"
+
+# ============================================================================
+#  PROFILES
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+#  [profiles.dev] — development mode
+# ----------------------------------------------------------------------------
+#  Records a trace of every (instance, solver) run so behavior can be
+#  inspected, replayed, and debugged.  This is what you want while
+#  developing solvers or the harness itself.
+[profiles.dev]
+# dev/prod only.  "dev" turns tracing on; "prod" turns it off.  You can
+# still pick a trace profile below — it only matters in dev.
+mode = "dev"
+
+# How much detail to trace:
+#   "full"      = every atomic step of every solver run (most data, most
+#                 slowdown)
+#   "decisions" = only state-changing decisions
+#   "summary"   = lifecycle events only (start/finish/kill)
+trace_profile = "full"
+
+# Max events recorded per solver run; 0 = unlimited.  Protects the
+# sessions directory from pathological solvers that emit endless events.
+trace_event_limit = 0
+
+# Max bytes of trace artifacts (numpy arrays etc.) per run; 0 = unlimited.
+trace_byte_limit = 0
+
+# If a run exceeds event/byte limits: true = fail the run loudly,
+# false = truncate quietly and keep going.
+trace_fail_on_limit = true
+
+# Name of the sessions folder label (sessions are stored as
+# <label>-<UTC timestamp>-<random>).
+session_label = "dev"
+
+# ----------------------------------------------------------------------------
+#  [profiles.prod] — production mode
+# ----------------------------------------------------------------------------
+#  No tracing, no session bookkeeping: the harness runs as fast as
+#  possible.  Use this for long, clean benchmark runs and for the
+#  leaderboard that gets published.
+[profiles.prod]
+mode = "prod"
+trace_profile = "summary"
+trace_event_limit = 0
+trace_byte_limit = 0
+trace_fail_on_limit = true
+session_label = "prod"
+
+# ============================================================================
+#  PATHS — where everything lives
+# ============================================================================
+#  The repo is split into two sides:
+#
+#    public/   committed, publishable artifacts — instance data, trained
+#              models, benchmark results, leaderboards.  This is what
+#              gets pushed to GitHub.
+#
+#    private/  gitignored, work-in-progress artifacts — dev-mode trace
+#              sessions, richer/experimental data packages, unpublished
+#              models and results.  Promote to public/ when ready.
+#
+#  All relative paths resolve against this file's directory.
+[paths]
+# Where generated instance manifests are written/read (published data).
+instances_dir = "public/data"
+
+# Where benchmark results and the leaderboard go (published results).
+results_dir = "public/results"
+
+# Where trained ML models are persisted (published models).
+models_dir = "public/models"
+
+# Where dev-mode trace sessions are recorded.  Traces record solver
+# internals, so they live on the private side.
+sessions_dir = "private/sessions"
+
+# Output file of `benchmark` (JSON with every run).
+benchmark_out = "public/results/benchmark.json"
+
+# Output file of `report` (rendered leaderboard, Markdown).
+leaderboard_out = "public/results/leaderboard.md"
+
+# Primary ML model (the candidate ranker) output of `train`.
+model_out = "public/models/candidate_ranker.joblib"
+
+# ============================================================================
+#  INSTANCES — how manifests are generated
+# ============================================================================
+[instances]
+# Per-instance time budget (seconds) given to the exact solver when
+# computing best-known values during `generate`.  0 = unlimited (solve
+# each instance to completion).
+#   - Large budgets (default 60) produce trustworthy best-known values
+#     but slow generation, especially on knapsack instances.
+#   - Small budgets (1-5) make `generate` fast; instances the solver
+#     cannot finish within budget are skipped (no best-known recorded).
+best_known_budget_seconds = 60.0
+
+# ============================================================================
+#  BENCHMARK — how benchmarks run
+# ============================================================================
+[benchmark]
+# Per-solver cooperative time budget in seconds; 0 = no budget (solvers
+# run to completion, only the hard timeout below applies).  When set,
+# solvers that implement early termination use it to cut work short.
+budget_seconds = 0
+
+# Hard wall-clock cap in seconds per (instance, solver) cell.  Cells that
+# exceed it are killed and recorded as "timeout".  Must be > 0.
+timeout_seconds = 30.0
+
+# Instance manifests to benchmark; empty = all manifests under
+# `paths.instances_dir`.  Entries are paths or globs relative to this
+# file's directory, e.g. ["data/instances/scheduling_manifests.json"].
+manifests = []
+
+# Which instance splits to benchmark: "test", "train", or both.
+splits = ["test"]
+
+# Restrict benchmarking to a subset of solvers by solver id; empty = all.
+# Useful while iterating on one solver, e.g. ["held_karp", "two_opt"].
+# Valid ids can be found in the leaderboard or the solver registry.
+solver_include = []
+
+# Solvers to skip by solver id, e.g. ["held_karp"] when you know it is
+# the bottleneck.  Takes precedence over `solver_include`.
+solver_exclude = []
+
+# ============================================================================
+#  PIPELINE — what the `all` command does
+# ============================================================================
+#  `all` runs these steps in order.  Remove a step to skip it, e.g. to
+#  benchmark and report without regenerating instances or retraining.
+[pipeline]
+steps = ["generate", "train", "benchmark", "report"]
+
+# ============================================================================
+#  RUNTIME — harness behaviour
+# ============================================================================
+[runtime]
+# Print progress messages while running; false = quiet (errors only).
+verbose = true
+
+# ============================================================================
+#  ML TRAINING — hyperparameters for the learned solvers
+# ============================================================================
+[ml]
+# Number of trees in the gradient-boosting ranker and the other
+# tree-based learned solvers.
+n_estimators = 250
+
+# Max tree depth for the same solvers.
+max_depth = 10
+
+# RNG seed for training; keep fixed for reproducible models, change to
+# explore different random initializations.
+random_state = 0

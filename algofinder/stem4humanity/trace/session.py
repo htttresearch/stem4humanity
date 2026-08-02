@@ -7,7 +7,7 @@ only appends its own event stream; it never owns terminal state.
 
 Layout (see docs/dev-mode-observability-design.md):
 
-    data/sessions/session-<UTC>-<random>/
+    private/sessions/session-<UTC>-<random>/
       session.json
       index.jsonl
       instances/<sha256>.json
@@ -29,7 +29,7 @@ from stem4humanity.trace.artifacts import ArtifactStore
 from stem4humanity.trace.model import Invocation, TraceConfig, TraceSummary
 from stem4humanity.trace.serialize import strict_dumps
 
-SESSIONS_ROOT = Path(__file__).resolve().parents[2] / "data" / "sessions"
+SESSIONS_ROOT = Path(__file__).resolve().parents[2] / "private" / "sessions"
 
 
 def _code_identity() -> dict[str, Any]:

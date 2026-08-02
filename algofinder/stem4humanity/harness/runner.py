@@ -2,11 +2,15 @@
 
 Usage::
 
-    python -m stem4humanity.harness.runner generate          # build manifests
-    python -m stem4humanity.harness.runner train             # train the ML ranker
-    python -m stem4humanity.harness.runner benchmark         # run all solvers
-    python -m stem4humanity.harness.runner report            # render leaderboard
-    python -m stem4humanity.harness.runner all               # generate + train + benchmark + report
+    python -m stem4humanity.harness.runner --config config/config.toml generate   # build manifests
+    python -m stem4humanity.harness.runner --config config/config.toml train      # train the ML solvers
+    python -m stem4humanity.harness.runner --config config/config.toml benchmark  # run all solvers
+    python -m stem4humanity.harness.runner --config config/config.toml report     # render leaderboard
+    python -m stem4humanity.harness.runner --config config/config.toml all        # generate + train + benchmark + report
+
+``--config`` may appear before or after the subcommand.  The config
+file (see ``config/config.toml``) supplies every default; explicit
+flags always win over it.
 """
 
 from __future__ import annotations
@@ -16,11 +20,14 @@ import json
 import sys
 from pathlib import Path
 
+from stem4humanity.config import (
+    Config,
+    ConfigError,
+    DEFAULT_CONFIG_PATH,
+    load_config,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = PROJECT_ROOT / "data"
-INSTANCES_DIR = DATA_DIR / "instances"
-RESULTS_DIR = DATA_DIR / "results"
-MODEL_PATH = DATA_DIR / "models" / "candidate_ranker.joblib"
 
 MANIFEST_GENERATORS = [
     ("stem4humanity.instances.bin_packing", "generate_bin_packing_manifests"),
@@ -34,84 +41,106 @@ MANIFEST_GENERATORS = [
 ]
 
 
-def _load_instances(manifest_paths: list[str]) -> list[object]:
+def _log(cfg: Config, message: str) -> None:
+    if cfg.verbose:
+        print(message)
+
+
+def _load_instances(manifest_paths: list[str], instances_dir: Path) -> list[object]:
     import stem4humanity.solvers.registry  # noqa: F401
     from stem4humanity.instances.base import load_manifest
 
     paths = [Path(path) for path in manifest_paths]
     if not paths:
-        if not INSTANCES_DIR.exists():
+        if not instances_dir.exists():
             raise SystemExit(
-                f"no manifests found under {INSTANCES_DIR}; "
+                f"no manifests found under {instances_dir}; "
                 "run 'python -m stem4humanity.harness.runner generate' first"
             )
-        paths = sorted(INSTANCES_DIR.glob("*.json"))
+        paths = sorted(instances_dir.glob("*.json"))
     instances: list[object] = []
     for path in paths:
         instances.extend(load_manifest(path))
     return instances
 
 
-def command_generate(args: argparse.Namespace) -> None:
-    output_dir = args.output_dir
+def _manifest_paths(args: argparse.Namespace, instances_dir: Path) -> list[Path]:
+    paths = [Path(path) for path in args.manifest]
+    if not paths and instances_dir.exists():
+        paths = sorted(instances_dir.glob("*.json"))
+    return paths
+
+
+def command_generate(args: argparse.Namespace, cfg: Config) -> None:
+    output_dir = Path(args.output_dir)
     for module_name, function_name in MANIFEST_GENERATORS:
         module = __import__(module_name, fromlist=[function_name])
-        getattr(module, function_name)(str(output_dir))
-        print(f"generated: {module_name}.{function_name} -> {output_dir}")
-    print(f"manifests written to {output_dir}")
+        getattr(module, function_name)(
+            str(output_dir),
+            best_known_budget_seconds=cfg.best_known_budget_seconds,
+        )
+        _log(cfg, f"generated: {module_name}.{function_name} -> {output_dir}")
+    _log(cfg, f"manifests written to {output_dir}")
 
 
-def command_benchmark(args: argparse.Namespace) -> None:
+def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
     from stem4humanity.harness.benchmark import run_benchmark
     from stem4humanity.trace.session import DevSession
 
     session: DevSession | None = None
-    if args.mode == "dev":
-        session = DevSession(profile=args.profile)
+    trace_profile = getattr(args, "profile", None) or cfg.trace_profile
+    if cfg.mode == "dev":
+        session = DevSession(
+            cfg.sessions_dir,
+            profile=trace_profile,
+            event_limit=cfg.trace_event_limit,
+            byte_limit=cfg.trace_byte_limit,
+            fail_on_limit=cfg.trace_fail_on_limit,
+            label=cfg.session_label,
+        )
         session.__enter__()
-        print(f"dev mode: session {session.session_id} at {session.dir}")
-        print(f"dev mode: trace profile {args.profile}")
-    instances = _load_instances(args.manifest)
-    print(
+        _log(cfg, f"dev mode: session {session.session_id} at {session.dir}")
+        _log(cfg, f"dev mode: trace profile {trace_profile}")
+    instances = _load_instances(args.manifest, cfg.instances_dir)
+    _log(
+        cfg,
         f"benchmarking {len(instances)} instances "
         f"(budget={args.budget_seconds}s, timeout={args.timeout_seconds}s, "
-        f"mode={args.mode})"
+        f"mode={cfg.mode}, splits={cfg.splits})",
     )
     try:
         runs = run_benchmark(
             instances,
             budget_seconds=args.budget_seconds,
             timeout_seconds=args.timeout_seconds,
+            splits=cfg.splits,
             session=session,
+            solver_include=cfg.solver_include,
+            solver_exclude=cfg.solver_exclude,
         )
     finally:
         if session is not None:
             session.close()
     record = {
         "config": {
+            "profile": cfg.profile,
             "budget_seconds": args.budget_seconds,
             "timeout_seconds": args.timeout_seconds,
-            "mode": args.mode,
-            "profile": args.profile,
+            "mode": cfg.mode,
+            "splits": list(cfg.splits),
+            "trace_profile": trace_profile,
             "session": session.session_id if session else None,
-            "manifests": [str(path) for path in _manifest_paths(args)],
+            "manifests": [str(path) for path in _manifest_paths(args, cfg.instances_dir)],
         },
         "runs": [run.to_mapping() for run in runs],
     }
     output = Path(args.out)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(record, indent=2) + "\n")
-    print(f"wrote {len(runs)} runs to {output}")
+    _log(cfg, f"wrote {len(runs)} runs to {output}")
 
 
-def _manifest_paths(args: argparse.Namespace) -> list[Path]:
-    paths = [Path(path) for path in args.manifest]
-    if not paths and INSTANCES_DIR.exists():
-        paths = sorted(INSTANCES_DIR.glob("*.json"))
-    return paths
-
-
-def command_report(args: argparse.Namespace) -> None:
+def command_report(args: argparse.Namespace, cfg: Config) -> None:
     from stem4humanity.harness.benchmark import BenchmarkRun
     from stem4humanity.harness.leaderboard import render_leaderboard
 
@@ -121,11 +150,11 @@ def command_report(args: argparse.Namespace) -> None:
     output = Path(args.out)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(leaderboard + "\n")
-    print(leaderboard)
-    print(f"leaderboard written to {output}")
+    _log(cfg, leaderboard)
+    _log(cfg, f"leaderboard written to {output}")
 
 
-def command_train(args: argparse.Namespace) -> None:
+def command_train(args: argparse.Namespace, cfg: Config) -> None:
     from stem4humanity.ml.train import (
         train_bp_packer,
         train_ps_prioritizer,
@@ -136,238 +165,280 @@ def command_train(args: argparse.Namespace) -> None:
         train_uc_storage,
     )
 
-    instances = _load_instances(args.manifest)
+    instances = _load_instances(args.manifest, cfg.instances_dir)
     train_instances = [instance for instance in instances if instance.split == "train"]
     if not train_instances:
         raise SystemExit(
-            f"no train-split instances in {_manifest_paths(args)}; "
+            f"no train-split instances in {_manifest_paths(args, cfg.instances_dir)}; "
             "run 'python -m stem4humanity.harness.runner generate' first"
         )
-    print(f"training on {len(train_instances)} train-split instances")
+    _log(cfg, f"training on {len(train_instances)} train-split instances")
     train_ranker(
         train_instances,
-        output_path=args.output,
+        output_path=Path(args.output),
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
     train_sp_pruner(
         train_instances,
-        output_path=DATA_DIR / "models" / "sp_pruner.joblib",
+        output_path=cfg.models_dir / "sp_pruner.joblib",
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
     train_sched_comparator(
         train_instances,
-        output_path=DATA_DIR / "models" / "sched_comparator.joblib",
+        output_path=cfg.models_dir / "sched_comparator.joblib",
         random_state=args.random_state,
     )
     train_bp_packer(
         train_instances,
-        output_path=DATA_DIR / "models" / "bp_packer.joblib",
+        output_path=cfg.models_dir / "bp_packer.joblib",
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
     train_ps_prioritizer(
         train_instances,
-        output_path=DATA_DIR / "models" / "ps_prioritizer.joblib",
+        output_path=cfg.models_dir / "ps_prioritizer.joblib",
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
     train_uc_committer(
         train_instances,
-        output_path=DATA_DIR / "models" / "uc_committer.joblib",
+        output_path=cfg.models_dir / "uc_committer.joblib",
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
     train_uc_storage(
         train_instances,
-        output_path=DATA_DIR / "models" / "uc_storage.joblib",
+        output_path=cfg.models_dir / "uc_storage.joblib",
         n_estimators=args.n_estimators,
         max_depth=args.max_depth,
         random_state=args.random_state,
     )
 
 
-def command_all(args: argparse.Namespace) -> None:
-    command_generate(args)
-    command_train(args)
-    command_benchmark(args)
-    command_report(args)
+def command_all(args: argparse.Namespace, cfg: Config) -> None:
+    steps = {
+        "generate": lambda: command_generate(args, cfg),
+        "train": lambda: command_train(args, cfg),
+        "benchmark": lambda: command_benchmark(args, cfg),
+    }
+    for step in cfg.pipeline_steps:
+        _log(cfg, f"[pipeline] {step}")
+        if step == "report":
+            report_args = argparse.Namespace(**vars(args))
+            report_args.runs = getattr(args, "out", None) or str(cfg.benchmark_out)
+            report_args.out = str(cfg.leaderboard_out)
+            command_report(report_args, cfg)
+        else:
+            steps[step]()
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser(cfg: Config) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="stem4humanity-harness",
         description="stem4humanity running env: generate instances, run "
         "benchmarks, render the leaderboard.",
     )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=str(DEFAULT_CONFIG_PATH),
+        help=f"path to the TOML config file (default: {DEFAULT_CONFIG_PATH})",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    def _config_flags(subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument(
+            "--config", default=argparse.SUPPRESS,
+            help=argparse.SUPPRESS,
+        )
 
     generate = subparsers.add_parser(
         "generate", help="generate all instance manifests"
     )
+    _config_flags(generate)
     generate.add_argument(
         "--output-dir",
         type=str,
-        default=str(INSTANCES_DIR),
-        help=f"manifest output directory (default: {INSTANCES_DIR})",
+        default=str(cfg.instances_dir),
+        help=f"manifest output directory (default: {cfg.instances_dir})",
     )
-    generate.set_defaults(func=command_generate)
+    generate.set_defaults(func=lambda args: command_generate(args, cfg))
 
     benchmark = subparsers.add_parser(
         "benchmark", help="run every applicable solver on every instance"
     )
+    _config_flags(benchmark)
     benchmark.add_argument(
         "--manifest",
         action="append",
-        default=[],
-        help="manifest file (repeatable; defaults to all under data/instances)",
+        default=list(cfg.manifests),
+        help="manifest file (repeatable; defaults to config 'manifests' "
+        "or all under the instances dir)",
     )
     benchmark.add_argument(
-        "--budget-seconds", type=float, default=None, help="per-solver time budget"
+        "--budget-seconds", type=float, default=cfg.budget_seconds,
+        help="per-solver time budget (config default: "
+        f"{cfg.budget_seconds})",
     )
     benchmark.add_argument(
         "--timeout-seconds",
         type=float,
-        default=30.0,
-        help="hard wall-clock cap per (instance, solver) cell (default: 30)",
+        default=cfg.timeout_seconds,
+        help="hard wall-clock cap per (instance, solver) cell (config "
+        f"default: {cfg.timeout_seconds})",
     )
     benchmark.add_argument(
         "--mode",
         type=str,
         choices=["prod", "dev"],
-        default="prod",
+        default=cfg.mode,
         help="prod: no tracing, run as fast as possible; "
-        "dev: record solver traces in a session under data/sessions "
-        "(default: prod)",
+        "dev: record solver traces in a session under the sessions dir "
+        f"(config default: {cfg.mode})",
     )
     benchmark.add_argument(
         "--profile",
         type=str,
         choices=["full", "decisions", "summary"],
-        default="full",
+        default=cfg.trace_profile,
         help="dev-mode trace profile: full = every atomic step; "
         "decisions = state-changing steps; summary = lifecycle only "
-        "(default: full)",
+        f"(config default: {cfg.trace_profile})",
     )
     benchmark.add_argument(
         "--out",
         type=str,
-        default=str(RESULTS_DIR / "benchmark.json"),
-        help=f"results file (default: {RESULTS_DIR / 'benchmark.json'})",
+        default=str(cfg.benchmark_out),
+        help=f"results file (config default: {cfg.benchmark_out})",
     )
-    benchmark.set_defaults(func=command_benchmark)
+    benchmark.set_defaults(func=lambda args: command_benchmark(args, cfg))
 
     report = subparsers.add_parser(
         "report", help="render the leaderboard from a benchmark run"
     )
+    _config_flags(report)
     report.add_argument(
         "--runs",
         type=str,
-        default=str(RESULTS_DIR / "benchmark.json"),
-        help=f"benchmark results file (default: {RESULTS_DIR / 'benchmark.json'})",
+        default=str(cfg.benchmark_out),
+        help=f"benchmark results file (config default: {cfg.benchmark_out})",
     )
     report.add_argument(
         "--out",
         type=str,
-        default=str(RESULTS_DIR / "leaderboard.md"),
-        help=f"leaderboard output (default: {RESULTS_DIR / 'leaderboard.md'})",
+        default=str(cfg.leaderboard_out),
+        help=f"leaderboard output (config default: {cfg.leaderboard_out})",
     )
-    report.set_defaults(func=command_report)
+    report.set_defaults(func=lambda args: command_report(args, cfg))
 
     train = subparsers.add_parser(
-        "train", help="train and persist the candidate-edge ranker"
+        "train", help="train and persist the learned solvers"
     )
+    _config_flags(train)
     train.add_argument(
         "--manifest",
         action="append",
-        default=[],
-        help="manifest file (repeatable; defaults to all under data/instances)",
+        default=list(cfg.manifests),
+        help="manifest file (repeatable; defaults to config 'manifests' "
+        "or all under the instances dir)",
     )
     train.add_argument(
         "--output",
         type=str,
-        default=str(MODEL_PATH),
-        help=f"model output (default: {MODEL_PATH})",
+        default=str(cfg.model_out),
+        help=f"primary model output (config default: {cfg.model_out})",
     )
-    train.add_argument("--n-estimators", type=int, default=250)
-    train.add_argument("--max-depth", type=int, default=10)
-    train.add_argument("--random-state", type=int, default=0)
-    train.set_defaults(func=command_train)
+    train.add_argument(
+        "--n-estimators", type=int, default=cfg.n_estimators,
+        help=f"trees in tree-based learned solvers (config default: {cfg.n_estimators})",
+    )
+    train.add_argument(
+        "--max-depth", type=int, default=cfg.max_depth,
+        help=f"max tree depth (config default: {cfg.max_depth})",
+    )
+    train.add_argument(
+        "--random-state", type=int, default=cfg.random_state,
+        help=f"training seed (config default: {cfg.random_state})",
+    )
+    train.set_defaults(func=lambda args: command_train(args, cfg))
 
     all_command = subparsers.add_parser(
-        "all", help="generate manifests, train, benchmark, and render the leaderboard"
+        "all", help="run the configured pipeline steps "
+        "(generate, train, benchmark, report)"
     )
+    _config_flags(all_command)
     all_command.add_argument(
         "--output-dir",
         type=str,
-        default=str(INSTANCES_DIR),
-        help=f"manifest output directory (default: {INSTANCES_DIR})",
+        default=str(cfg.instances_dir),
+        help=f"manifest output directory (default: {cfg.instances_dir})",
     )
     all_command.add_argument(
         "--manifest",
         action="append",
-        default=[],
-        help="manifest file (repeatable; defaults to all under data/instances)",
+        default=list(cfg.manifests),
+        help="manifest file (repeatable; defaults to config 'manifests' "
+        "or all under the instances dir)",
     )
     all_command.add_argument(
         "--output",
         type=str,
-        default=str(MODEL_PATH),
-        help=f"model output (default: {MODEL_PATH})",
+        default=str(cfg.model_out),
+        help=f"primary model output (config default: {cfg.model_out})",
     )
     all_command.add_argument(
-        "--runs",
-        type=str,
-        default=str(RESULTS_DIR / "benchmark.json"),
-        help=f"benchmark results file (default: {RESULTS_DIR / 'benchmark.json'})",
-    )
-    all_command.add_argument(
-        "--budget-seconds", type=float, default=None, help="per-solver time budget"
+        "--budget-seconds", type=float, default=cfg.budget_seconds,
+        help="per-solver time budget",
     )
     all_command.add_argument(
         "--timeout-seconds",
         type=float,
-        default=30.0,
-        help="hard wall-clock cap per (instance, solver) cell (default: 30)",
-    )
-    all_command.add_argument(
-        "--mode",
-        type=str,
-        choices=["prod", "dev"],
-        default="prod",
-        help="prod: no tracing, run as fast as possible; "
-        "dev: record solver traces in a session under data/sessions "
-        "(default: prod)",
-    )
-    all_command.add_argument(
-        "--profile",
-        type=str,
-        choices=["full", "decisions", "summary"],
-        default="full",
-        help="dev-mode trace profile (default: full)",
+        default=cfg.timeout_seconds,
+        help="hard wall-clock cap per (instance, solver) cell",
     )
     all_command.add_argument(
         "--out",
         type=str,
-        default=str(RESULTS_DIR / "benchmark.json"),
-        help=f"results file (default: {RESULTS_DIR / 'benchmark.json'})",
+        default=str(cfg.benchmark_out),
+        help=f"results file (config default: {cfg.benchmark_out})",
     )
-    all_command.add_argument("--n-estimators", type=int, default=250)
-    all_command.add_argument("--max-depth", type=int, default=10)
-    all_command.add_argument("--random-state", type=int, default=0)
-    all_command.set_defaults(func=command_all)
+    all_command.add_argument(
+        "--n-estimators", type=int, default=cfg.n_estimators
+    )
+    all_command.add_argument("--max-depth", type=int, default=cfg.max_depth)
+    all_command.add_argument("--random-state", type=int, default=cfg.random_state)
+    all_command.set_defaults(func=lambda args: command_all(args, cfg))
+    return parser
+
+
+def _pre_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        "--config", default=str(DEFAULT_CONFIG_PATH),
+        help="path to the TOML config file",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
+    argv = list(sys.argv[1:] if argv is None else argv)
+    pre = _pre_parser()
+    pre_ns, _ = pre.parse_known_args(argv)
+    try:
+        cfg = load_config(pre_ns.config)
+    except ConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    parser = build_parser(cfg)
     args = parser.parse_args(argv)
+    args.config = cfg
     args.func(args)
     return 0
 

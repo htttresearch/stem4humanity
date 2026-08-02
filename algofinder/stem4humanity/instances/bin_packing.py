@@ -96,7 +96,11 @@ def generate_large_items_instances(
     return records
 
 
-def generate_bin_packing_manifests(output_dir: str = "data/instances") -> None:
+def generate_bin_packing_manifests(
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
+) -> None:
     all_instances: list[Instance] = []
     for sizes in ((10, 13), (13, 16)):
         all_instances.extend(
@@ -126,7 +130,7 @@ def generate_bin_packing_manifests(output_dir: str = "data/instances") -> None:
     large_items = [i for i in all_instances if i.subproblem == "large-items"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(large_items, exact, problem)
+        for instance in annotate_best_known(large_items, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances
@@ -136,7 +140,7 @@ def generate_bin_packing_manifests(output_dir: str = "data/instances") -> None:
     vectors = [i for i in all_instances if i.subproblem == "vector"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(vectors, exact, problem)
+        for instance in annotate_best_known(vectors, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances

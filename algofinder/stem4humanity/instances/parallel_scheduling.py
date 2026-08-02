@@ -130,7 +130,9 @@ def generate_forest_instances(
 
 
 def generate_parallel_scheduling_manifests(
-    output_dir: str = "data/instances",
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = None,
 ) -> None:
     all_instances: list[Instance] = []
     for sizes in ((8, 11), (11, 14)):
@@ -155,7 +157,7 @@ def generate_parallel_scheduling_manifests(
     forests = [i for i in all_instances if i.subproblem == "forest"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(forests, exact, problem)
+        for instance in annotate_best_known(forests, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances
@@ -167,7 +169,7 @@ def generate_parallel_scheduling_manifests(
     generals = [i for i in all_instances if i.subproblem == "general"]
     annotated = {
         instance.name: instance
-        for instance in annotate_best_known(generals, exact, problem)
+        for instance in annotate_best_known(generals, exact, problem, budget_seconds=best_known_budget_seconds)
     }
     all_instances = [
         annotated.get(instance.name, instance) for instance in all_instances

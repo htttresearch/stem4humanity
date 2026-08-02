@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 DEFAULT_MODEL_PATH = (
     Path(__file__).resolve().parents[3]
-    / "data"
+    / "public"
     / "models"
     / "sched_comparator.joblib"
 )

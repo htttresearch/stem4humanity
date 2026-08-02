@@ -76,7 +76,11 @@ def generate_knapsack_instances(
     return records
 
 
-def generate_knapsack_manifests(output_dir: str = "data/instances") -> None:
+def generate_knapsack_manifests(
+    output_dir: str = "public/data",
+    *,
+    best_known_budget_seconds: float | None = 60.0,
+) -> None:
     all_instances: list[Instance] = []
     for subproblem in ("0-1", "multidimensional", "subset-sum"):
         all_instances.extend(
@@ -93,6 +97,6 @@ def generate_knapsack_manifests(output_dir: str = "data/instances") -> None:
     problem = get_problem("knapsack")
     exact = next(s for s in all_solvers().values() if s.id == "knapsack-bnb-exact")
     all_instances = annotate_best_known(
-        all_instances, exact, problem, budget_seconds=60.0
+        all_instances, exact, problem, budget_seconds=best_known_budget_seconds
     )
     save_manifest(all_instances, f"{output_dir}/knapsack_manifests.json")

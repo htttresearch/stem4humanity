@@ -328,6 +328,24 @@ def summarize_partial(events_path: Path) -> TraceSummary:
     )
 
 
+def _select_solvers(
+    solvers: list[type],
+    include: tuple[str, ...] = (),
+    exclude: tuple[str, ...] = (),
+) -> list[type]:
+    """Filter an enumerated solver list by id (include set, then exclude)."""
+    include_set = set(include)
+    exclude_set = set(exclude)
+    selected: list[type] = []
+    for solver_cls in solvers:
+        if include_set and solver_cls.id not in include_set:
+            continue
+        if solver_cls.id in exclude_set:
+            continue
+        selected.append(solver_cls)
+    return selected
+
+
 def run_benchmark(
     instances: Iterable[Instance],
     *,
@@ -335,6 +353,8 @@ def run_benchmark(
     timeout_seconds: float | None = None,
     splits: tuple[str, ...] = ("test",),
     session: DevSession | None = None,
+    solver_include: tuple[str, ...] = (),
+    solver_exclude: tuple[str, ...] = (),
 ) -> list[BenchmarkRun]:
     """Run every applicable solver on every requested instance.
 
@@ -366,7 +386,11 @@ def run_benchmark(
             state_sha = _state_fingerprint(instance, state)
             if session:
                 session.store.publish_json("instances", instance.to_mapping())
-            for solver_cls in solvers_for(instance.problem, instance.subproblem):
+            for solver_cls in _select_solvers(
+                solvers_for(instance.problem, instance.subproblem),
+                solver_include,
+                solver_exclude,
+            ):
                 invocation = None
                 if session:
                     invocation = session.start_run(
