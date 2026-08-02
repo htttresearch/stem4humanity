@@ -1,4 +1,4 @@
-"""stem4humanity: STEM4Humanity step 0.0.1 — an algorithm finder.
+"""stem4humanity: stem4humanity step 0.0.1 — an algorithm finder.
 
 For every problem in the matrix we provide a general solver, specialized
 solvers per subproblem, exact and heuristic approaches, ML-flavored solvers,

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "stem4humanity"
 version = "0.0.1"
-description = "STEM4Humanity step 0.0.1: an algorithm finder for classic CS problems with exact, heuristic, and ML solvers"
+description = "stem4humanity step 0.0.1: an algorithm finder for classic CS problems with exact, heuristic, and ML solvers"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",

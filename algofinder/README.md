@@ -6,7 +6,7 @@ packing, shortest path, unit commitment) that pits **exact** solvers,
 on generated instance suites, and renders a leaderboard of which family
 wins where.
 
-Part of STEM4Humanity step 0.0.1: a running environment that generates
+Part of stem4humanity step 0.0.1: a running environment that generates
 instances, trains per-problem ML solvers, benchmarks every solver, and
 reports results.
 

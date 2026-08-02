@@ -1,4 +1,4 @@
-# STEM4Humanity
+# stem4humanity
 
 **Mission:** 
 Improve (the +STEM -> +Human Benefit) pipeline

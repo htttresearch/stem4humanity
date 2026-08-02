@@ -6,15 +6,15 @@
     "profile": "full",
     "session": null,
     "manifests": [
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/bin_packing_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/knapsack_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/parallel_scheduling_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/scheduling_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/shortest_path_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/tsp_general_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/tsp_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/unit_commitment_classic_manifests.json",
-      "/home/vniversvs/Labora/agents/projects/STEM4Humanity/algofinder/data/instances/unit_commitment_storage_manifests.json"
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/bin_packing_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/knapsack_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/parallel_scheduling_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/scheduling_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/shortest_path_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/tsp_general_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/tsp_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/unit_commitment_classic_manifests.json",
+      "/home/vniversvs/Labora/agents/projects/stem4humanity/algofinder/data/instances/unit_commitment_storage_manifests.json"
     ]
   },
   "runs": [
