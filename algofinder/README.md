@@ -1,4 +1,4 @@
-# stem4humanity
+# algofinder
 
 An algorithm finder for classic optimization problems (TSP, scheduling,
 packing, shortest path, unit commitment) that pits **exact** solvers,
@@ -56,11 +56,11 @@ pip install -e ".[dev]"    # optional: pytest
 ## Usage
 
 ```bash
-python -m stem4humanity.harness.runner generate    # build all instance manifests
-python -m stem4humanity.harness.runner train       # train the ML solvers
-python -m stem4humanity.harness.runner benchmark   # run every applicable solver
-python -m stem4humanity.harness.runner report      # render the leaderboard
-python -m stem4humanity.harness.runner all         # generate + train + benchmark + report
+python -m algofinder.harness.runner generate    # build all instance manifests
+python -m algofinder.harness.runner train       # train the ML solvers
+python -m algofinder.harness.runner benchmark   # run every applicable solver
+python -m algofinder.harness.runner report      # render the leaderboard
+python -m algofinder.harness.runner all         # generate + train + benchmark + report
 ```
 
 `benchmark` and `all` accept `--manifest <file>` (repeatable) to scope a
@@ -80,7 +80,7 @@ Every run happens in one of two universal modes:
 Example:
 
 ```bash
-python -m stem4humanity.harness.runner benchmark --mode dev --manifest public/data/unit_commitment_classic_manifests.json
+python -m algofinder.harness.runner benchmark --mode dev --manifest public/data/unit_commitment_classic_manifests.json
 ```
 
 Currently traced in dev mode (one JSONL per instance+solver):
@@ -97,7 +97,7 @@ Currently traced in dev mode (one JSONL per instance+solver):
 
 Tracing is intentionally ad hoc until a universal problem/solver
 abstraction is settled; new solvers can opt in via
-`stem4humanity.util.tracing` (`open_trace`, `write_record`).
+`algofinder.util.tracing` (`open_trace`, `write_record`).
 
 The proposed universal replacement is specified in
 [`docs/dev-mode-observability-design.md`](docs/dev-mode-observability-design.md).

@@ -3,8 +3,8 @@ import random
 
 import numpy as np
 
-from stem4humanity.problems.knapsack import KnapsackState
-from stem4humanity.solvers.knapsack.branch_and_bound import BranchAndBoundExact
+from algofinder.problems.knapsack import KnapsackState
+from algofinder.solvers.knapsack.branch_and_bound import BranchAndBoundExact
 
 
 def brute_force(state):

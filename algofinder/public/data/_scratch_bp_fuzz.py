@@ -2,8 +2,8 @@ import random
 
 import numpy as np
 
-from stem4humanity.problems.bin_packing import BinPackingState
-from stem4humanity.solvers.bin_packing.exact_dfs import BPDfsExactSolver
+from algofinder.problems.bin_packing import BinPackingState
+from algofinder.solvers.bin_packing.exact_dfs import BPDfsExactSolver
 
 
 def brute_force(state):

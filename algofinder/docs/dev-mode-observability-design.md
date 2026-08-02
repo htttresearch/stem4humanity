@@ -3,7 +3,7 @@
 Status: proposed design; no runtime code has been changed.
 
 This document defines a universal dev-mode data-gathering system for
-`stem4humanity`. It is based on the current harness, all seven implemented problem
+`algofinder`. It is based on the current harness, all seven implemented problem
 families, all 32 registered solvers, and the four existing ad hoc traces.
 
 ## Executive decision
@@ -42,7 +42,7 @@ coverage.
 one solver will emit every loop iteration, another will emit only incumbents,
 and both will claim to be fully traced.
 
-For an algorithm-complete, full-profile trace, `stem4humanity` should guarantee:
+For an algorithm-complete, full-profile trace, `algofinder` should guarantee:
 
 > For every atomic semantic step declared by the solver's versioned trace
 > contract, the trace contains an ordered event identifying the logical state
@@ -86,7 +86,7 @@ The current architecture has good foundations:
   result independently, and isolates cells in a worker for hard timeouts;
 - solver and problem registries provide a place to enforce new contracts.
 
-Current dev tracing lives in `stem4humanity/util/tracing.py`. It stores a global
+Current dev tracing lives in `algofinder/util/tracing.py`. It stores a global
 session directory, lets a solver derive a JSONL filename, and appends arbitrary
 dictionaries. Four of the 32 registered solvers use it:
 
@@ -589,7 +589,7 @@ Each outcome reports both requested and achieved coverage:
 ```
 
 Profile and scope are different. A full, boundary-complete trace of a NetworkX
-call can contain every `stem4humanity` step and the exact call input/output while
+call can contain every `algofinder` step and the exact call input/output while
 still declaring the library's internals opaque. `algorithm` scope is allowed
 only when there are no undeclared opaque decisions below the chosen algorithm
 boundary.

@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "stem4humanity"
+name = "algofinder"
 version = "0.0.1"
-description = "stem4humanity step 0.0.1: an algorithm finder for classic CS problems with exact, heuristic, and ML solvers"
+description = "algofinder step 0.0.1: an algorithm finder for classic CS problems with exact, heuristic, and ML solvers"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24",
@@ -20,4 +20,4 @@ numba = ["numba>=0.58"]
 dev = ["pytest"]
 
 [tool.setuptools.packages.find]
-include = ["stem4humanity*"]
+include = ["algofinder*"]
