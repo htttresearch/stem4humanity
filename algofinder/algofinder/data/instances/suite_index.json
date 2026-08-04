@@ -1,0 +1,108 @@
+{
+  "anytime_quality": {
+    "cells": 18,
+    "families": [
+      "gaussian_mixture",
+      "grid_jitter",
+      "narrow_strip",
+      "rings",
+      "spiral",
+      "uniform_rect"
+    ],
+    "instances": 30,
+    "lineage_roots": 18,
+    "manifest": "tsp_anytime_quality_manifests.json",
+    "sizes": [
+      100,
+      300,
+      324,
+      500,
+      529
+    ],
+    "split_weights": {
+      "test": 30.0
+    },
+    "splits": {
+      "test": 30
+    }
+  },
+  "exact_structure": {
+    "cells": 37,
+    "families": [
+      "cocircular",
+      "collinear_run",
+      "convex_k_inner",
+      "duplicates",
+      "gaussian_mixture",
+      "grid_jitter",
+      "line",
+      "narrow_strip",
+      "onion_layers",
+      "parallel_lines",
+      "poisson_disc",
+      "quantized",
+      "rings",
+      "small_integer",
+      "spiral",
+      "uniform_rect"
+    ],
+    "instances": 96,
+    "lineage_roots": 37,
+    "manifest": "tsp_exact_structure_manifests.json",
+    "sizes": [
+      9,
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "split_weights": {
+      "test": 96.0
+    },
+    "splits": {
+      "test": 96
+    }
+  },
+  "ml_ood": {
+    "cells": 66,
+    "families": [
+      "cocircular",
+      "collinear_run",
+      "convex_k_inner",
+      "disk_clusters",
+      "gaussian_mixture",
+      "grid_jitter",
+      "line",
+      "narrow_strip",
+      "poisson_disc",
+      "rings",
+      "small_integer",
+      "spiral",
+      "uniform_rect"
+    ],
+    "instances": 196,
+    "lineage_roots": 66,
+    "manifest": "tsp_ml_ood_manifests.json",
+    "sizes": [
+      49,
+      50,
+      100
+    ],
+    "split_weights": {
+      "test_family_ood": 36.0,
+      "test_iid": 42.0,
+      "test_parameter_ood": 36.0,
+      "train": 54.0,
+      "validation": 28.0
+    },
+    "splits": {
+      "test_family_ood": 36,
+      "test_iid": 42,
+      "test_parameter_ood": 36,
+      "train": 54,
+      "validation": 28
+    }
+  },
+  "schema": "etsp.suite_index.v1"
+}

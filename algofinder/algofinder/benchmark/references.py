@@ -151,6 +151,21 @@ class ReferenceRegistry:
                 records.append(json.loads(line))
         return records
 
+    def load_matching(
+        self, instance_id: str, kind: str
+    ) -> dict[str, object] | None:
+        """Highest-status accepted record for (instance_id, kind), or None."""
+        match = None
+        for record in self.load_all():
+            if record.get("instance_id") != instance_id or record.get("kind") != kind:
+                continue
+            if record["status"] in ("superseded", "disputed"):
+                continue
+            rank = {"verified": 2, "imported_unverified": 1}.get
+            if match is None or rank(record["status"], 0) > rank(match["status"], 0):
+                match = record
+        return match
+
     def snapshot(self) -> dict[tuple[str, str], dict[str, object]]:
         """Resolve the currently accepted record per (instance_id, kind)."""
         accepted: dict[tuple[str, str], dict[str, object]] = {}
