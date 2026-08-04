@@ -1,0 +1,191 @@
+[
+  {
+    "name": "tsp:tetrahedron:1.00",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "tetrahedron",
+    "seed": 7,
+    "data": {
+      "points": [
+        [
+          -0.433713080067169,
+          -0.5300575584387351,
+          0.7286507729499891
+        ],
+        [
+          0.4353044143974781,
+          -0.6220177976029261,
+          -0.6508486200886302
+        ],
+        [
+          -0.6920753132366907,
+          0.5458105003387722,
+          -0.4723586122092791
+        ],
+        [
+          0.6904839789063817,
+          0.606264855702889,
+          0.39455645934792016
+        ]
+      ],
+      "dimension": 3,
+      "metric": "EUC_3D",
+      "construction": {
+        "family": "tetrahedron_regular",
+        "radius": 1.0,
+        "seed": 7,
+        "prng": "numpy.default_rng(v1)",
+        "generator_version": "tetrahedron-regular-v1"
+      },
+      "lineage_group_id": "366b2e60e60e1bde28f16fa722b734dc2d925735c3ce75674dfbd70860dbd1c7",
+      "coordinate_parent_id": "8b49d2c0b51fa5b3d1618f3f2e60e8fd2ad96c923b571c1fe35ab4f80381e3c5",
+      "objective_sibling_group_id": "8b49d2c0b51fa5b3d1618f3f2e60e8fd2ad96c923b571c1fe35ab4f80381e3c5",
+      "instance_id": "1ae614da880d1ba1110f5937bf44d337c21ce00d8002060a643dd02830adcf7c"
+    },
+    "split": "test",
+    "best_known": 8.0
+  },
+  {
+    "name": "tsp:tetrahedron:2.50",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "tetrahedron",
+    "seed": 7,
+    "data": {
+      "points": [
+        [
+          -1.0842827001679225,
+          -1.3251438960968378,
+          1.8216269323749728
+        ],
+        [
+          1.088261035993695,
+          -1.5550444940073156,
+          -1.6271215502215755
+        ],
+        [
+          -1.7301882830917268,
+          1.3645262508469305,
+          -1.1808965305231978
+        ],
+        [
+          1.7262099472659542,
+          1.515662139257223,
+          0.9863911483698005
+        ]
+      ],
+      "dimension": 3,
+      "metric": "EUC_3D",
+      "construction": {
+        "family": "tetrahedron_regular",
+        "radius": 2.5,
+        "seed": 7,
+        "prng": "numpy.default_rng(v1)",
+        "generator_version": "tetrahedron-regular-v1"
+      },
+      "lineage_group_id": "103876d5bc2114520bdbf460dd7c587c1f3b26c3d7aa6b03de65b4913f05ce59",
+      "coordinate_parent_id": "66f3e76dd03c5d56e4b000c60cd9b286fb7f77c329325a86ba8371a5fbf5265f",
+      "objective_sibling_group_id": "66f3e76dd03c5d56e4b000c60cd9b286fb7f77c329325a86ba8371a5fbf5265f",
+      "instance_id": "862727b56fc146370df13292ed6f984b396c99ca927988b5cbe80c9628b0f863"
+    },
+    "split": "test",
+    "best_known": 16.0
+  },
+  {
+    "name": "tsp:tetrahedron:0.50",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "tetrahedron",
+    "seed": 7,
+    "data": {
+      "points": [
+        [
+          -0.2168565400335845,
+          -0.26502877921936757,
+          0.3643253864749946
+        ],
+        [
+          0.21765220719873904,
+          -0.31100889880146304,
+          -0.3254243100443151
+        ],
+        [
+          -0.34603765661834535,
+          0.2729052501693861,
+          -0.23617930610463955
+        ],
+        [
+          0.34524198945319085,
+          0.3031324278514445,
+          0.19727822967396008
+        ]
+      ],
+      "dimension": 3,
+      "metric": "EUC_3D",
+      "construction": {
+        "family": "tetrahedron_regular",
+        "radius": 0.5,
+        "seed": 7,
+        "prng": "numpy.default_rng(v1)",
+        "generator_version": "tetrahedron-regular-v1"
+      },
+      "lineage_group_id": "e6075681bc2fcdc725bbeb4fc41eaa45df05234b84b6c344cbbab466c9e19478",
+      "coordinate_parent_id": "9d47e9fa5b3d7104361521d194babcfa3b16321b8e54651272b51475729aa297",
+      "objective_sibling_group_id": "9d47e9fa5b3d7104361521d194babcfa3b16321b8e54651272b51475729aa297",
+      "instance_id": "78faf8a2b18fb04a3c6f5c2c6c42468df5af1b318103e5ef120dbc14777f1987"
+    },
+    "split": "test",
+    "best_known": 4.0
+  },
+  {
+    "name": "tsp:tetrahedron:box5",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "tetrahedron",
+    "seed": 11,
+    "data": {
+      "points": [
+        [
+          -0.7428595944616008,
+          -0.0014442751197700776,
+          0.20299671524671492
+        ],
+        [
+          -0.9426219832561109,
+          -0.7041478308450881,
+          0.856422045920739
+        ],
+        [
+          -0.8591588476916063,
+          -0.740452101201404,
+          0.8966569065835501
+        ],
+        [
+          0.24376718559276567,
+          -0.26201375254041803,
+          0.022780043606525302
+        ],
+        [
+          0.3256859050335985,
+          -0.4493823684777414,
+          -0.7240638542660893
+        ]
+      ],
+      "dimension": 3,
+      "metric": "EUC_3D",
+      "construction": {
+        "family": "box_random",
+        "count": 5,
+        "seed": 11,
+        "prng": "numpy.default_rng(v1)",
+        "generator_version": "tetrahedron-regular-v1"
+      },
+      "lineage_group_id": "143c1eadeff64bafe5c06d86b3abffac2bf5ddfec58495d16bd28667d7300dbd",
+      "coordinate_parent_id": "e5b5c1beba088ead7cc5693da82ed2a0fe2cf1dc243133884cffc05521a294ef",
+      "objective_sibling_group_id": "e5b5c1beba088ead7cc5693da82ed2a0fe2cf1dc243133884cffc05521a294ef",
+      "instance_id": "bd0a831d908d0d27c3b4ddae39fcdc3a1c5129004ed1831041c968b1fa8c9b41"
+    },
+    "split": "test",
+    "best_known": 4.8241282737975855
+  }
+]

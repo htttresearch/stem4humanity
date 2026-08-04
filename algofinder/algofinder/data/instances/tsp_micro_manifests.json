@@ -1,0 +1,664 @@
+[
+  {
+    "name": "tsp:micro:triangle",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.0
+        ]
+      ],
+      "note": "smallest nontrivial polygon",
+      "lineage_group": "micro:triangle",
+      "coordinate_parent_id": "9dd1ca2d70668af27de218fcc75c7557b7b86189a15ecad3d52f00ef02782ec0",
+      "objective_sibling_group_id": "9dd1ca2d70668af27de218fcc75c7557b7b86189a15ecad3d52f00ef02782ec0",
+      "lineage_group_id": "67fbb768cd3ad97664fab1bd0737934380d4fa4a434cc2d153f7888b5b1a65d2",
+      "instance_id": "af8934abd1ef7d1c6984116914b26d0e82c2c250fb985416d0b75a7729ab6e82",
+      "instance_id_raw_l2": "5cfa639dd4634f0455520f70347c22a9ba1501af394353cb7c490025cd456be8",
+      "objective_refs": {
+        "raw_l2_f64@1": 6.82842712474619,
+        "tsplib_euc_2d@1": 7.0,
+        "tsplib_ceil_2d@1": 7.0
+      }
+    },
+    "split": "test",
+    "best_known": 6.82842712474619
+  },
+  {
+    "name": "tsp:micro:square",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          2.0,
+          2.0
+        ],
+        [
+          0.0,
+          2.0
+        ]
+      ],
+      "note": "ties everywhere under L2",
+      "lineage_group": "micro:square",
+      "coordinate_parent_id": "32a29adf7223bfa1b63f7cdebf1acc099801f6d153e5301298e4ed6b96b8315c",
+      "objective_sibling_group_id": "32a29adf7223bfa1b63f7cdebf1acc099801f6d153e5301298e4ed6b96b8315c",
+      "lineage_group_id": "43ea812ce002b545050c3a57bfa47f46de1739a413e436294fa979f92b5d6d50",
+      "instance_id": "5ecc81a8cc32841cf41e828e55943278ac1ea9314dd1dac938d74fac02039a08",
+      "instance_id_raw_l2": "5cb3274bf5dc3163b7ee523822b29b3c01c9f8670c4ab15086f4df559093d6d0",
+      "objective_refs": {
+        "raw_l2_f64@1": 8.0,
+        "tsplib_euc_2d@1": 8.0,
+        "tsplib_ceil_2d@1": 8.0
+      }
+    },
+    "split": "test",
+    "best_known": 8.0
+  },
+  {
+    "name": "tsp:micro:rectangle",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          4.0,
+          0.0
+        ],
+        [
+          4.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "note": "many degenerate L2 alternatives",
+      "lineage_group": "micro:rectangle",
+      "coordinate_parent_id": "fec1cb8e877d84dfe2d5d899c015d46de448db198f03512b15fd397735482975",
+      "objective_sibling_group_id": "fec1cb8e877d84dfe2d5d899c015d46de448db198f03512b15fd397735482975",
+      "lineage_group_id": "add66cde77b9dd7391630ba237f6f5cba66d53c80358d5378097fbe4ff09e4ed",
+      "instance_id": "1ad302ddd8b4f030af21f3638a7e982a152cf81b1130f2212cd2ff4de84ff5e5",
+      "instance_id_raw_l2": "6732dc48bdef9df030795d3a8e0b764a9e8f7bbbb51f91fbd38f4cfd201e55ca",
+      "objective_refs": {
+        "raw_l2_f64@1": 10.0,
+        "tsplib_euc_2d@1": 10.0,
+        "tsplib_ceil_2d@1": 10.0
+      }
+    },
+    "split": "test",
+    "best_known": 10.0
+  },
+  {
+    "name": "tsp:micro:regular_pentagon",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.30901699437494745,
+          0.9510565162951535
+        ],
+        [
+          -0.8090169943749473,
+          0.5877852522924732
+        ],
+        [
+          -0.8090169943749476,
+          -0.587785252292473
+        ],
+        [
+          0.30901699437494723,
+          -0.9510565162951536
+        ]
+      ],
+      "note": "rotation symmetry",
+      "lineage_group": "micro:regular_pentagon",
+      "coordinate_parent_id": "7793e02505c60c8c326a1fa1c465c091a387f1a42197e812bad5425310f502b7",
+      "objective_sibling_group_id": "7793e02505c60c8c326a1fa1c465c091a387f1a42197e812bad5425310f502b7",
+      "lineage_group_id": "8d7bc24359697af3d3f2370653f2005fbc245b53896cd774149aabae619f50f6",
+      "instance_id": "1de0748a71587bfe1d05a4f0d57fa2517b66f6b1720e165d23ab127e7af3f95e",
+      "instance_id_raw_l2": "e5559669469b724609107377433b4125bffd35f80c34f2622e13112f56956cdb"
+    },
+    "split": "test",
+    "best_known": 5.877852522924732
+  },
+  {
+    "name": "tsp:micro:convex_random",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.1,
+          0.1
+        ],
+        [
+          0.8,
+          0.2
+        ],
+        [
+          0.9,
+          0.9
+        ],
+        [
+          0.3,
+          1.0
+        ],
+        [
+          0.0,
+          0.6
+        ],
+        [
+          0.05,
+          0.3
+        ]
+      ],
+      "note": "general convex position",
+      "lineage_group": "micro:convex_random",
+      "coordinate_parent_id": "ff2f1461f35adec6956c60458491b68a0bfd4ddf6431716560622b02c8391607",
+      "objective_sibling_group_id": "ff2f1461f35adec6956c60458491b68a0bfd4ddf6431716560622b02c8391607",
+      "lineage_group_id": "614a42ea8e89209683186924ae14305886acbaf6b72f1be706d47ed68c9c1b8d",
+      "instance_id": "e03c749de21f2757f6d9a476b7f956573ef9673a4fe4b8575c7a75dcf51edf81",
+      "instance_id_raw_l2": "fd573053e6676de663a8d2bcdccdac9d181124d9759121c4ecedff7456ae508c"
+    },
+    "split": "test",
+    "best_known": 3.032783223198711
+  },
+  {
+    "name": "tsp:micro:line_horizontal",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          4.0,
+          0.0
+        ]
+      ],
+      "note": "zero-area, unique tour",
+      "lineage_group": "micro:line_horizontal",
+      "coordinate_parent_id": "80bb1c8e6a9e22baa10430625c5270eebba58da10a9e72b8b209920dd8303729",
+      "objective_sibling_group_id": "80bb1c8e6a9e22baa10430625c5270eebba58da10a9e72b8b209920dd8303729",
+      "lineage_group_id": "b1e0870d8eb541b78c5472f4c06b57498ff6a00af5928110715fd8022193d278",
+      "instance_id": "d479178faf27afcbb084cfbaa831066480ffd3d27cb12815e5f80f08628afc62",
+      "instance_id_raw_l2": "5a30740397cd813b513a612a26140639ae2073e9605ffde98febf55af291a1b3",
+      "objective_refs": {
+        "raw_l2_f64@1": 8.0,
+        "tsplib_euc_2d@1": 8.0,
+        "tsplib_ceil_2d@1": 8.0
+      }
+    },
+    "split": "test",
+    "best_known": 8.0
+  },
+  {
+    "name": "tsp:micro:line_vertical",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          2.0
+        ],
+        [
+          0.0,
+          3.0
+        ],
+        [
+          0.0,
+          4.0
+        ]
+      ],
+      "note": "zero-area, vertical",
+      "lineage_group": "micro:line_vertical",
+      "coordinate_parent_id": "f0af38d5dbdd389fc5144a37d1b9e5f158704f2f326bf8d387da5c408136e02d",
+      "objective_sibling_group_id": "f0af38d5dbdd389fc5144a37d1b9e5f158704f2f326bf8d387da5c408136e02d",
+      "lineage_group_id": "58e95ccff3bc44bc98e01bd8dbb9df964563a513a230b40d3d320aae9e071eeb",
+      "instance_id": "9f32aece8bb2b9cfa1d06430a82185974679efda40989d531b6006ab62a0067c",
+      "instance_id_raw_l2": "d855c3c57eddd06fb1621e6671074004681eecdd2976b5e5613005fda798c5cc",
+      "objective_refs": {
+        "raw_l2_f64@1": 8.0,
+        "tsplib_euc_2d@1": 8.0,
+        "tsplib_ceil_2d@1": 8.0
+      }
+    },
+    "split": "test",
+    "best_known": 8.0
+  },
+  {
+    "name": "tsp:micro:all_coincident",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "note": "fully degenerate",
+      "lineage_group": "micro:all_coincident",
+      "coordinate_parent_id": "a427029a269ac428fd4c54ad811578c5c1fd4bd5cccffcbb85f3644a06cee3aa",
+      "objective_sibling_group_id": "a427029a269ac428fd4c54ad811578c5c1fd4bd5cccffcbb85f3644a06cee3aa",
+      "lineage_group_id": "a471841da0b838833691229a7e0a24f46accff6063cf3987e73760c0f603f947",
+      "instance_id": "684b87be1e160018d25dd3f52dbf02c2e35251a67f85eb0749f2b1bd3cb48b27",
+      "instance_id_raw_l2": "aab25b7df44b3dd857fb7d1410ed10cbce4574cdf076de29e7e8f02b349b7196",
+      "objective_refs": {
+        "raw_l2_f64@1": 0.0,
+        "tsplib_euc_2d@1": 0.0,
+        "tsplib_ceil_2d@1": 0.0
+      }
+    },
+    "split": "test",
+    "best_known": 0.0
+  },
+  {
+    "name": "tsp:micro:partial_duplicates",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          2.0,
+          2.0
+        ],
+        [
+          0.0,
+          2.0
+        ]
+      ],
+      "note": "exact duplicate cities",
+      "lineage_group": "micro:partial_duplicates",
+      "coordinate_parent_id": "f71682bb30c0cdf7dc949064d48c2ecc57bad5b4bdd9cca39025307e2902088f",
+      "objective_sibling_group_id": "f71682bb30c0cdf7dc949064d48c2ecc57bad5b4bdd9cca39025307e2902088f",
+      "lineage_group_id": "10e120ceeedd12fd1b201f67c0fc321ec454461935bc8682fb045ba3767ddb4b",
+      "instance_id": "26be6f85f9676b70dd1fde82a2fb32b028a27b34f5a67adef0f81a954ccb4b6f",
+      "instance_id_raw_l2": "55094fb473406db8e0affaf95f0235df0eb852edb4dd6fe92881288468051618",
+      "objective_refs": {
+        "raw_l2_f64@1": 8.0,
+        "tsplib_euc_2d@1": 8.0,
+        "tsplib_ceil_2d@1": 8.0
+      }
+    },
+    "split": "test",
+    "best_known": 8.0
+  },
+  {
+    "name": "tsp:micro:collinear_run",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.25
+        ],
+        [
+          0.5,
+          0.25
+        ],
+        [
+          1.0,
+          0.25
+        ],
+        [
+          1.5,
+          0.25
+        ],
+        [
+          2.0,
+          0.25
+        ],
+        [
+          2.5,
+          0.25
+        ]
+      ],
+      "note": "collinear points",
+      "lineage_group": "micro:collinear_run",
+      "coordinate_parent_id": "76c5ff4214fe48930558f6720d209444c5b84f506f9350b65bc2d22b966f3e03",
+      "objective_sibling_group_id": "76c5ff4214fe48930558f6720d209444c5b84f506f9350b65bc2d22b966f3e03",
+      "lineage_group_id": "83092fc178e549bdf148626e756d0b4f255ee5aeb40a3831c2e5e78d63f21084",
+      "instance_id": "2f91a9023f1a681ead4eaaa05def324d1e3c279091ddfe4b3520186b185eddab",
+      "instance_id_raw_l2": "0899016ea3302d586827e56912f404cc4105a4db17fced823184de38b7b901a4"
+    },
+    "split": "test",
+    "best_known": 5.0
+  },
+  {
+    "name": "tsp:micro:cocircular",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          2.0,
+          0.0
+        ],
+        [
+          1.0000000000000002,
+          1.7320508075688772
+        ],
+        [
+          -0.9999999999999996,
+          1.7320508075688774
+        ],
+        [
+          -2.0,
+          2.4492935982947064e-16
+        ],
+        [
+          -1.0000000000000009,
+          -1.7320508075688767
+        ],
+        [
+          1.0000000000000002,
+          -1.7320508075688772
+        ]
+      ],
+      "note": "many optimal tours",
+      "lineage_group": "micro:cocircular",
+      "coordinate_parent_id": "4502367180790611a781aba68db6099c3076e62c5bb9ccd5f11463b82e22e38c",
+      "objective_sibling_group_id": "4502367180790611a781aba68db6099c3076e62c5bb9ccd5f11463b82e22e38c",
+      "lineage_group_id": "bbb5c47f880b97ebf3efa74282637cab53ada242d5ef86d9ba7d371e199eaa81",
+      "instance_id": "91301152178cf2b95ddd465c1de84c0b73302cbec9a6f2f909553f3eda2d2a97",
+      "instance_id_raw_l2": "43e562cad7b228e6c70aa87d30a39aef599907537d54d5eb9bd9233487fbc7cf"
+    },
+    "split": "test",
+    "best_known": 12.0
+  },
+  {
+    "name": "tsp:micro:integer_grid_3x3",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          2.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          2.0
+        ],
+        [
+          2.0,
+          0.0
+        ],
+        [
+          2.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0
+        ]
+      ],
+      "note": "repeated distances; modes differ (raw/euc/ceil)",
+      "lineage_group": "micro:integer_grid_3x3",
+      "coordinate_parent_id": "33f5c88ea30a91c2765c92bffb5bb8f683578adffefaee8da8a4cf2913ede1b4",
+      "objective_sibling_group_id": "33f5c88ea30a91c2765c92bffb5bb8f683578adffefaee8da8a4cf2913ede1b4",
+      "lineage_group_id": "b81ade16783afb32cc7f6f296edd9fdb2cc52f49e9ab0171eb2151c56aad1669",
+      "instance_id": "8efc27fa450ee86172d47f3558383ef8d079be54510dd87ad56f0f969eb78a4e",
+      "instance_id_raw_l2": "ac3c71f97ffbfd2b499bfadc4124b68d76b5b5874057357a3a60516e7731eb39",
+      "objective_refs": {
+        "raw_l2_f64@1": 9.414213562373096,
+        "tsplib_euc_2d@1": 9.0,
+        "tsplib_ceil_2d@1": 10.0
+      }
+    },
+    "split": "test",
+    "best_known": 9.414213562373096
+  },
+  {
+    "name": "tsp:micro:one_interior_point",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          4.0,
+          0.0
+        ],
+        [
+          4.0,
+          4.0
+        ],
+        [
+          0.0,
+          4.0
+        ],
+        [
+          1.5,
+          1.5
+        ]
+      ],
+      "note": "interior city",
+      "lineage_group": "micro:one_interior_point",
+      "coordinate_parent_id": "57dcf9d4aef829b81239c77bef77ce5627e6b315a1f7338889966dfe7913ed18",
+      "objective_sibling_group_id": "57dcf9d4aef829b81239c77bef77ce5627e6b315a1f7338889966dfe7913ed18",
+      "lineage_group_id": "a3f631cc29912eef1af8bff44874c21a39b60660e7c671026c9bdd40130034ba",
+      "instance_id": "e4830cf2593694819045e7c5b05dfc359cce31fc4eb02dcc0ac66077fef8155c",
+      "instance_id_raw_l2": "e7e9af67e4e554c0d1d335daba1bb4ddcdde4db9d7c6997a4cdad24688d88c7a"
+    },
+    "split": "test",
+    "best_known": 17.03679629098229
+  },
+  {
+    "name": "tsp:micro:nested_layers",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          6.0,
+          0.0
+        ],
+        [
+          6.0,
+          6.0
+        ],
+        [
+          0.0,
+          6.0
+        ],
+        [
+          2.0,
+          2.0
+        ],
+        [
+          4.0,
+          2.0
+        ],
+        [
+          4.0,
+          4.0
+        ],
+        [
+          2.0,
+          4.0
+        ]
+      ],
+      "note": "nested convex layers",
+      "lineage_group": "micro:nested_layers",
+      "coordinate_parent_id": "8dc177561172a90c83128763c1d7a18cf8cdd82195146477edad59c40a482458",
+      "objective_sibling_group_id": "8dc177561172a90c83128763c1d7a18cf8cdd82195146477edad59c40a482458",
+      "lineage_group_id": "ddd01c87f33ae836e5a8cf1d456f714c9a3a0a8f6b504f850a74be94fcce53b9",
+      "instance_id": "0b84d860c476bf7c2ea1cf703d561cb22468fb3a4835bea484da35d82c8673a1",
+      "instance_id_raw_l2": "bbc4595cebb731aab48e5be062a30f710f502f2d1cd1cac4b786f2990fa99b4b",
+      "objective_refs": {
+        "raw_l2_f64@1": 27.31370849898476,
+        "tsplib_euc_2d@1": 28.0,
+        "tsplib_ceil_2d@1": 28.0
+      }
+    },
+    "split": "test",
+    "best_known": 27.31370849898476
+  },
+  {
+    "name": "tsp:micro:extreme_aspect",
+    "problem": "tsp",
+    "subproblem": "euclidean",
+    "family": "micro",
+    "seed": 0,
+    "data": {
+      "points": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          10000.0,
+          0.0
+        ],
+        [
+          10000.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "note": "extreme aspect ratio",
+      "lineage_group": "micro:extreme_aspect",
+      "coordinate_parent_id": "d04b8ffb6335a14a3daa179fa1fd71727ed8acb8b44f53daa89d7fe97d0698a9",
+      "objective_sibling_group_id": "d04b8ffb6335a14a3daa179fa1fd71727ed8acb8b44f53daa89d7fe97d0698a9",
+      "lineage_group_id": "911cba9fa66c54f9392ac095a988b8dc30f6f7435451192c4730a66335e55e5e",
+      "instance_id": "e532e0dbc2c1ac8fa6af11678c72b4263e67cd671a4cb7f362ebf19f8fae27cc",
+      "instance_id_raw_l2": "23f1b22b92ccf5d28fad4ddb93e9319e20bf378d1f65e409578bde6d618a8792",
+      "objective_refs": {
+        "raw_l2_f64@1": 20002.0,
+        "tsplib_euc_2d@1": 20002.0,
+        "tsplib_ceil_2d@1": 20002.0
+      }
+    },
+    "split": "test",
+    "best_known": 20002.0
+  }
+]
