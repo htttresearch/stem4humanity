@@ -1,0 +1,1682 @@
+[
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "006bc5397e5638747e491d70613b79c35742b9cbae7c7cf33e58400577f3a973",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": "b9eaf5cf8bb6b7a02fee02103ca4ae68d57161650cc4739dd9633e501fe0884a",
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "rescored_published_optimum"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "72203d73bc8f9c60eec27ee7f48856bd9bfb10a409afc23abe18324d8022b1a1",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      97,
+      102,
+      81,
+      94,
+      106,
+      4,
+      99,
+      142,
+      96,
+      145,
+      25,
+      74,
+      17,
+      141,
+      84,
+      64,
+      131,
+      136,
+      49,
+      54,
+      57,
+      140,
+      82,
+      55,
+      89,
+      45,
+      91,
+      53,
+      137,
+      133,
+      130,
+      31,
+      22,
+      37,
+      66,
+      42,
+      108,
+      50,
+      19,
+      24,
+      109,
+      80,
+      28,
+      85,
+      134,
+      69,
+      107,
+      101,
+      113,
+      98,
+      18,
+      1,
+      36,
+      5,
+      27,
+      8,
+      41,
+      119,
+      46,
+      138,
+      39,
+      52,
+      117,
+      23,
+      11,
+      115,
+      100,
+      40,
+      56,
+      38,
+      126,
+      68,
+      35,
+      60,
+      10,
+      147,
+      129,
+      16,
+      65,
+      59,
+      139,
+      116,
+      128,
+      26,
+      30,
+      122,
+      73,
+      12,
+      105,
+      90,
+      118,
+      67,
+      127,
+      44,
+      70,
+      43,
+      63,
+      111,
+      135,
+      144,
+      143,
+      48,
+      146,
+      71,
+      79,
+      13,
+      121,
+      76,
+      132,
+      14,
+      77,
+      20,
+      149,
+      114,
+      3,
+      103,
+      21,
+      124,
+      148,
+      61,
+      2,
+      112,
+      9,
+      93,
+      87,
+      120,
+      78,
+      58,
+      15,
+      110,
+      104,
+      32,
+      125,
+      51,
+      92,
+      123,
+      34,
+      95,
+      88,
+      7,
+      6,
+      83,
+      29,
+      62,
+      47,
+      72,
+      75,
+      33,
+      86
+    ],
+    "value": 6528.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "0899016ea3302d586827e56912f404cc4105a4db17fced823184de38b7b901a4",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "843e52257f490678a47067c715050f2ff5696543b34656cf2d81e2a15b5812f5",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 5.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "08b371cfd22118ac67ccb63bb51381be112d40f5e46938ffadeba165e6f53100",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "309d82486086198ce8496b30e663987bc11dd992f094c20887636dda8cb032d9",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1,
+      3
+    ],
+    "value": 16.32993161855452
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "0902560d41f24734872c728d9295c19d5bd6eb29ab288a51cbb1e146babbb303",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": "ffdd42640b7882b8618febfcde132dfc1f97d01ae9c495b94f7c7ee8c1473e64",
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "rescored_published_optimum"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "756baf0a7f87b760e4a52486966146411c55e88a33d74a08b584500d06f25827",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      32,
+      62,
+      15,
+      2,
+      43,
+      31,
+      8,
+      38,
+      71,
+      57,
+      9,
+      30,
+      54,
+      24,
+      49,
+      17,
+      23,
+      48,
+      22,
+      55,
+      40,
+      42,
+      41,
+      63,
+      21,
+      60,
+      20,
+      46,
+      35,
+      68,
+      70,
+      59,
+      69,
+      19,
+      36,
+      4,
+      14,
+      56,
+      12,
+      53,
+      18,
+      13,
+      58,
+      65,
+      64,
+      37,
+      10,
+      52,
+      6,
+      34,
+      7,
+      45,
+      33,
+      51,
+      26,
+      44,
+      28,
+      47,
+      29,
+      3,
+      74,
+      75,
+      66,
+      25,
+      11,
+      39,
+      16,
+      50,
+      5,
+      67,
+      1,
+      73,
+      27,
+      61,
+      72
+    ],
+    "value": 538.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "0b84d860c476bf7c2ea1cf703d561cb22468fb3a4835bea484da35d82c8673a1",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "fc6d92fadc7bf7ac5431165f896a25024e97d27de2f3c21b3d6dd2517a2c305d",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      7,
+      3,
+      2,
+      6,
+      5,
+      1
+    ],
+    "value": 28.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "1174fe4c1ff44422f0944c4225d6c225a735a48a2826e99ae9de5015baed23a6",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "concorde_branch_and_cut"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "dimacs-challenge-bounds",
+      "source_url": "http://dimacs.rutgers.edu/archive/Challenges/TSP/bounds"
+    },
+    "reference_id": "a86597c479e50c3357fa4d45a131bf55df6d06e54ce0a8bcf598913274d52b44",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": null,
+    "value": 22985695.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "1ad302ddd8b4f030af21f3638a7e982a152cf81b1130f2212cd2ff4de84ff5e5",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "2602d41606d12da17381d7c82be27a0374474a4c6e553301601b03ab18b0a2cb",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 10.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "1ae614da880d1ba1110f5937bf44d337c21ce00d8002060a643dd02830adcf7c",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_3d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact_plus_all_edges_equal"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "7f29e77d3d1fd29a0f9cb8cee264a82b8724bbc1c1f8f2889670a688150c0ca6",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      1,
+      2
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "23f1b22b92ccf5d28fad4ddb93e9319e20bf378d1f65e409578bde6d618a8792",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "4854f3ad9b639dfa998389de71255bdd5b7dd4a4253eb6ed69d808dd9b628c06",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 20002.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "26be6f85f9676b70dd1fde82a2fb32b028a27b34f5a67adef0f81a954ccb4b6f",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "6aa1617ffcccf7f1c66d50234969b667e1c29a2849120c63fa9b257cecdae99f",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "2cc3321fff76f69364f29f69dba337d2448bf6ba87db374c4f8ee5c502c922cc",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "63865a85f4de53b02d2d8ca7455d2c05e5a8d516d185c846387123933f32a613",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      7,
+      3,
+      2,
+      6,
+      5,
+      1
+    ],
+    "value": 28.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "341625762f79d713dd7d1375038269e12370887584d444f21923592fc8ba4f4e",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "d36df4cd70cf1c8aa80abd70957c6f87ffb031b2361ae72a0ed3ca2fd68f8de1",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 7.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "43e562cad7b228e6c70aa87d30a39aef599907537d54d5eb9bd9233487fbc7cf",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "74546e577ab0e01b88c186379d7e97d588873c295b34f53b9ea4a97356287d0c",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 12.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "55094fb473406db8e0affaf95f0235df0eb852edb4dd6fe92881288468051618",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "b6a89658ad42c0861475f66fa1a970317e8868e0f789328bc845c12048e61c8c",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "57d196e37ea9945271a1a4c556c7d45120958222de46d8b0ef25437b2d593609",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "4d739af13c3c3d11406ca66d6c02911321b70c8875622becab5ae0f49ee9748c",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      1,
+      2
+    ],
+    "value": 6.531972647421809
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "5a30740397cd813b513a612a26140639ae2073e9605ffde98febf55af291a1b3",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "c2810ffb7402e4916e1d1bd11aa8d5d94be22380e62be86f0efa75d76a3df1f1",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "5cb3274bf5dc3163b7ee523822b29b3c01c9f8670c4ab15086f4df559093d6d0",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "9d1694d6f5e43310d10c63ce9fca89d50ba8714d9092087d67bce571d5afa374",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "5cfa639dd4634f0455520f70347c22a9ba1501af394353cb7c490025cd456be8",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "a66278356065ea4fcda7dcea3590b2a56113dc021ace02a7713efb3328155646",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 6.82842712474619
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "5ecc81a8cc32841cf41e828e55943278ac1ea9314dd1dac938d74fac02039a08",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "fe8df12ac3196b765706e296ac0921ad51c91033a03474820e3ffb684cf24097",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "65762bb5d422128d8e94dc8a1db3a7b69e5b4959616324ea0064d741320e45a2",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "95f9c2f75744790b585fd74516c7916f0525833a37ddbc1fef760034cc17abcd",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "6732dc48bdef9df030795d3a8e0b764a9e8f7bbbb51f91fbd38f4cfd201e55ca",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "86a429fed037487a37ebb1e458148db155c2fc125d1bb152eb4e1d9b1c9e9ae6",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 10.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "684b87be1e160018d25dd3f52dbf02c2e35251a67f85eb0749f2b1bd3cb48b27",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "f5fb9a34434e60269f28477259938938d651e56f72bbfe74c3b0f6debf1eb0aa",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 0.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "78faf8a2b18fb04a3c6f5c2c6c42468df5af1b318103e5ef120dbc14777f1987",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_3d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact_plus_all_edges_equal"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "dc174e259a12877919430b3d1e938a95e9ff3061d848485a8be8c2d5a3d95732",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      1,
+      2
+    ],
+    "value": 4.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "7937f7b8216bfec6ac2ca5f19b5289f4a7935f9da22f7e4dfb2727c144afe0ec",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": "fb84e8aba84b163b782d60bc5a6d3d402bccf5d5d77355d03b4713044617c8fc",
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "rescored_published_optimum"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "c94ca5f4bbc8f14b2bff0a557cb8ae36145db30e6545b72a9b297841da62840a",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      21,
+      7,
+      25,
+      30,
+      27,
+      2,
+      35,
+      34,
+      19,
+      1,
+      28,
+      20,
+      15,
+      49,
+      33,
+      29,
+      8,
+      48,
+      9,
+      38,
+      32,
+      44,
+      14,
+      43,
+      41,
+      39,
+      18,
+      40,
+      12,
+      24,
+      13,
+      23,
+      42,
+      6,
+      22,
+      47,
+      5,
+      26,
+      50,
+      45,
+      11,
+      46,
+      17,
+      3,
+      16,
+      36,
+      4,
+      37,
+      10,
+      31
+    ],
+    "value": 426.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "7a4b7fb1a904363c93bdeb333596e687ce8fde51722714837bce66611834c6a5",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": "8f3915f397dcdbf9f07bd570fc41faa7e9b3d27391537f048164b2f937d1ccc9",
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "rescored_published_optimum"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "1c33d2f8287e032fe916861ba3c8c9829728bd9caec7eec1d0610219ba95edf3",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      48,
+      31,
+      44,
+      18,
+      40,
+      7,
+      8,
+      9,
+      42,
+      32,
+      50,
+      10,
+      51,
+      13,
+      12,
+      46,
+      25,
+      26,
+      27,
+      11,
+      24,
+      3,
+      5,
+      14,
+      4,
+      23,
+      47,
+      37,
+      36,
+      39,
+      38,
+      35,
+      34,
+      33,
+      43,
+      45,
+      15,
+      28,
+      49,
+      19,
+      22,
+      29,
+      1,
+      6,
+      41,
+      20,
+      16,
+      2,
+      17,
+      30,
+      21
+    ],
+    "value": 7542.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "7d94614bede0ae50173b051bcc4c7e8c75ea42fb529ce02d43d02b0ec33a66fa",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "9f9c8b95c3af0f6cbe66cc329609e4d5c4f58b9012a0b7ea7616e4faa91fd23d",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "7e2d93900d5472506f975b9d64eda4ce150ec5da23bf8a6e7a56848a26f77f2d",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "published_table"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "e1bf2b7c982646b86d01ab620629a7414ebc0222216c9f543d9a61c6fa621839",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": null,
+    "value": 42029.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "862727b56fc146370df13292ed6f984b396c99ca927988b5cbe80c9628b0f863",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_3d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact_plus_all_edges_equal"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "b00ffcebca901877086a71f280e7e433d5526162873df10793b5022634632295",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1,
+      3
+    ],
+    "value": 16.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "8efc27fa450ee86172d47f3558383ef8d079be54510dd87ad56f0f969eb78a4e",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "830f812f4ec7305323abaccea8cc1a890b749c38c683020acfe1a1e38d12988c",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      6,
+      7,
+      8,
+      5,
+      4,
+      2,
+      1
+    ],
+    "value": 9.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "9418807a9778940513fe242733807b44a214eebdcd803432cf31a3ceb700f71a",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "600b7b12ad39606e15025aa6cbd5bfdd5886ce7d965dc77efb53c403b8ccc662",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      6,
+      7,
+      8,
+      5,
+      4,
+      2,
+      1
+    ],
+    "value": 10.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "984f7ed8f9d232838bea907146bbb9617aa3a585e322a9e1afe6b44212ba67d7",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "published_table"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "8f155525ba318cdf3c8546bd7a1bb821f77e84341898fcab4d2c5e065f0c3f9e",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": null,
+    "value": 29368.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "9f32aece8bb2b9cfa1d06430a82185974679efda40989d531b6006ab62a0067c",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "91f5b82f149126fb3131559fc145c547ba145e383ac8c4c86b54c384f781d45b",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "aab25b7df44b3dd857fb7d1410ed10cbce4574cdf076de29e7e8f02b349b7196",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "ce3973b22cbc21913db45c61010b80e930e33195fb2ff9f4a670c5e519e3a924",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 0.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "ac3c71f97ffbfd2b499bfadc4124b68d76b5b5874057357a3a60516e7731eb39",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "ded0f19e1b56bb80db43fdb2b2f99170701aec19a8e528f222d6c0b6da4aa410",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      6,
+      7,
+      8,
+      5,
+      4,
+      2,
+      1
+    ],
+    "value": 9.414213562373096
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "af8934abd1ef7d1c6984116914b26d0e82c2c250fb985416d0b75a7729ab6e82",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "15c550900aef085e24c132ff620a667ec5db01bcfa7b8bcfa2ff077b65e14414",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 7.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "b05323c17bbe6ec11d105809e987a9b52935ee510236f469e87e2b6a7fd422a7",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "bbc616ce8c0c05e40d81e3f840484b59e4ab3063f21d12580becb18aa18d4730",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "bbc4595cebb731aab48e5be062a30f710f502f2d1cd1cac4b786f2990fa99b4b",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "7ef06cfa970d8e3990b417e67da62e6d0b289876d39fb3c095f7e7de7d1d924b",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      7,
+      3,
+      2,
+      6,
+      5,
+      1
+    ],
+    "value": 27.31370849898476
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "bd0a831d908d0d27c3b4ddae39fcdc3a1c5129004ed1831041c968b1fa8c9b41",
+    "kind": "upper_bound",
+    "objective_spec_id": "tsplib_euc_3d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "raw_l2_optimal_tour"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "ba047e82984b8d186e01b99e88d747bf254218928993ede57a56fd2f31c40c63",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 4.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "c08c30cccc91243d693b327125f686ec692dbeb78d3ef7c89d1fec696a657c9c",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "81df9e2e5bb1af446ce1fed314b360b06da72d2a88eab310ba3b72ab18ae7b10",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      1,
+      2
+    ],
+    "value": 3.2659863237109046
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "c0b15ad11268f9f2cc808472a76dad04f4ee0c26b1b09e54713c7bda41a0dabd",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "fa262d7c170fe8ecc16733667bcae96dd14610a41e048ae566f61fc6c743d293",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "cc8ef9ba5738c887953f979119070dbe05a873cd0b5d7fbe0a389a75b04daf5a",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "51d2edea9eb963432622d69a71305344d6191bdbb5a711551f29db9bc9314ae6",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 10.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "cfb3c6e1f2e1b8c0c08c89f55ad4117464b01b29226b3099019ddadfa3f90769",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "46632128dfb21ba5373897b546b9ad8b776bfa8571d18c35e4e68b6bb04cdebe",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      2,
+      1
+    ],
+    "value": 0.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "d479178faf27afcbb084cfbaa831066480ffd3d27cb12815e5f80f08628afc62",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "927624ea62354817df0e00b5882fc5332f190392f14730113cbae8297c741f3e",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "d855c3c57eddd06fb1621e6671074004681eecdd2976b5e5613005fda798c5cc",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "e1f1b5c38c3f36c7410c00caaf849b65a4b6d6f8fc5843886e42fddf9160e4d3",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 8.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "dd7e1ed6905d60eb804da91fb3a229b593ffb9f630013e574754ff87aa346f1e",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_ceil_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "b1a88edfe37d8fa7dce95fc563836cbd0b3af1c5d2e992ebd5d1b7035f6e6959",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 20002.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "e1f77c7f58e2224be999c6b33628a749e3588ab858303a763ebc278fd75f7600",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "published_table"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "d6736e2982551728868a24a1bcb0abb109614e0bd3988e7da705cf5eb8ed87b5",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": null,
+    "value": 48191.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "e532e0dbc2c1ac8fa6af11678c72b4263e67cd671a4cb7f362ebf19f8fae27cc",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "1e47729cc04f65d79bad62a994f50e5f198bd2b910156649e2372395f1f22fe0",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1
+    ],
+    "value": 20002.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "e5559669469b724609107377433b4125bffd35f80c34f2622e13112f56956cdb",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "e91556cc8b0c813093b549f14f9ef0a3ae84da58902d492f15ff915e330425f4",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 5.877852522924732
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "e7e9af67e4e554c0d1d335daba1bb4ddcdde4db9d7c6997a4cdad24688d88c7a",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "3770cb7966f4ba319cb75e5290b2605ee2aace76ce0a0cd9025695d34c09c970",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      3,
+      2,
+      1,
+      4
+    ],
+    "value": 17.03679629098229
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "eb170b6aa1215f9f1762059e25940bf0a4cecd3bd3fbaabca803037191aae984",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tetrahedron-regular-v1",
+      "source_url": "generated:tetrahedron"
+    },
+    "reference_id": "4c7619632045567b71f3cce785b2b09854015c66ddf189fb32cc48d66f89e697",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 4.8241282737975855
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "f7b15a41fe8a523a862513f9229d9a68e5d4725cd85827f49f994af9bd76aa17",
+    "kind": "certified_optimum",
+    "objective_spec_id": "tsplib_euc_2d@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": null,
+      "method": "published_table"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "tsplib95",
+      "source_url": "https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/"
+    },
+    "reference_id": "c1898e3b8dffe43523eb63af7e698ea2109eca82936ba8ff600c5f7cb2ed0d0f",
+    "schema_version": "etsp.reference.v1",
+    "status": "imported_unverified",
+    "tour": null,
+    "value": 36905.0
+  },
+  {
+    "created_at": "2026-08-02",
+    "instance_id": "fd573053e6676de663a8d2bcdccdac9d181124d9759121c4ecedff7456ae508c",
+    "kind": "certified_optimum",
+    "objective_spec_id": "raw_l2_f64@1",
+    "proof": {
+      "artifact_digest": null,
+      "independent_verifier": "algofinder.benchmark.scoring",
+      "method": "held_karp_exact"
+    },
+    "provenance": {
+      "retrieved_at": "2026-08-02",
+      "source_name": "semantic_micro",
+      "source_url": "generated:semantic_micro"
+    },
+    "reference_id": "237efb79830352ef83d0478d781feae43222d7d3d1825ad35a4f29b2234ae7fd",
+    "schema_version": "etsp.reference.v1",
+    "status": "verified",
+    "tour": [
+      0,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "value": 3.032783223198711
+  }
+]

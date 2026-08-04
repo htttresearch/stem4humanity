@@ -221,7 +221,14 @@
       "metric": "EUC_2D",
       "sha256": "8496a5838133e3c3eb25a9fa8893b1ac302593fc8dc325350643a0cabd8abadc",
       "opt_tour_rescored": true,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "22c193d096495f2d5e43ca550187989e090820361c7f605299bc27f2a1afd0f8",
+      "objective_sibling_group_id": "22c193d096495f2d5e43ca550187989e090820361c7f605299bc27f2a1afd0f8",
+      "lineage_group_id": "5ae5a897d9ed4b82b41f250342bb93fbca4babede6c24a1786166d4d738753d1",
+      "instance_id": "7a4b7fb1a904363c93bdeb333596e687ce8fde51722714837bce66611834c6a5",
+      "instance_id_raw_l2": "c479dacf84351c08775b4dd1574f5e11df6f8489c5b008dfa1f477a603d6a814",
+      "instance_id_ceil_2d": "b49b24cc9ae65b4198f1b3927fbaedc779f06d64fa314600c40ca7b0670efedc",
+      "best_known_status": "verified"
     },
     "split": "test",
     "best_known": 7542.0
@@ -840,7 +847,14 @@
       "metric": "EUC_2D",
       "sha256": "05abd424f773269b13477d367e534797aac080fb536a28074a72a9c0ba8064f5",
       "opt_tour_rescored": true,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "86811bea29c3f7dbc37034adea64d5f3a680c377e837c9ef41547c235e49400f",
+      "objective_sibling_group_id": "86811bea29c3f7dbc37034adea64d5f3a680c377e837c9ef41547c235e49400f",
+      "lineage_group_id": "7c8a9dd9f7a364e7fb03cf55fad6ac5ab729fe0ab67beef24ef2b2c1a37caf9e",
+      "instance_id": "006bc5397e5638747e491d70613b79c35742b9cbae7c7cf33e58400577f3a973",
+      "instance_id_raw_l2": "b34805e44976cfe8cb681c95f83b82d2f21649e110baa8e6d7d941cee8915e84",
+      "instance_id_ceil_2d": "c3e3de83ac8caa3d9020fbcdc8ed9c45b226b140fede7ec1f3dfa70f6fa14c46",
+      "best_known_status": "verified"
     },
     "split": "test",
     "best_known": 6528.0
@@ -1063,7 +1077,14 @@
       "metric": "EUC_2D",
       "sha256": "66c05ad077ffd64d5778e358bbd16be049f8c8ae880cbd24f034487331d1ccce",
       "opt_tour_rescored": true,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "c16a53010d7baacafc12a427a1fd2282cf3603429570005eec0d226aabbc7064",
+      "objective_sibling_group_id": "c16a53010d7baacafc12a427a1fd2282cf3603429570005eec0d226aabbc7064",
+      "lineage_group_id": "42f1e18c60997c6837b1212a2c85a6b796ee6d8e5c80bf3d60d00086d0c93c20",
+      "instance_id": "7937f7b8216bfec6ac2ca5f19b5289f4a7935f9da22f7e4dfb2727c144afe0ec",
+      "instance_id_raw_l2": "4eb54feb7d8b4bea750f4e8543c9938a22adc4e00154788547d64cf0eb5371bf",
+      "instance_id_ceil_2d": "2f8cdcfe680ecce05c78e80b74645dc80a6d54bbdcddefe4f00a2c6b33e63c57",
+      "best_known_status": "verified"
     },
     "split": "test",
     "best_known": 426.0
@@ -1386,7 +1407,14 @@
       "metric": "EUC_2D",
       "sha256": "74a81d109969e0e46ecc62ff9bd051bfce36b508326bfcd22168e58d03af2447",
       "opt_tour_rescored": true,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "88ef3390fd76c8a45c09f0fcf1ffbf68a197c816c144045c679ea70ea249562d",
+      "objective_sibling_group_id": "88ef3390fd76c8a45c09f0fcf1ffbf68a197c816c144045c679ea70ea249562d",
+      "lineage_group_id": "43c57ce93d9718b26ab2ec59d67dc916d42be0099d814ca2d192efc3a2e6ac4d",
+      "instance_id": "0902560d41f24734872c728d9295c19d5bd6eb29ab288a51cbb1e146babbb303",
+      "instance_id_raw_l2": "a96f79122aa3c9b5f3aea35a938a1a9d27dca1307fdbda8ac9fce69c39181874",
+      "instance_id_ceil_2d": "37b2075416abe5ea640740277440f9d7a113dd4e03881074ec9a9d9a94206d54",
+      "best_known_status": "verified"
     },
     "split": "test",
     "best_known": 538.0
@@ -2205,7 +2233,14 @@
       "metric": "EUC_2D",
       "sha256": "fd1f7640e823286826796bfccd103787c25f0b52e7275fae7eabf286303c0cbe",
       "opt_tour_rescored": false,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "428741e628a570bfb0cacd1afa0b8cab83bf9f72e1b1a55367b48bf3b614ca0b",
+      "objective_sibling_group_id": "428741e628a570bfb0cacd1afa0b8cab83bf9f72e1b1a55367b48bf3b614ca0b",
+      "lineage_group_id": "5325ffd0fc7740fa44e0e0da1d35911c1183318a8cdfba21cc4d79c8a18b5763",
+      "instance_id": "984f7ed8f9d232838bea907146bbb9617aa3a585e322a9e1afe6b44212ba67d7",
+      "instance_id_raw_l2": "d6eaff48fffc73d823421e4630806648e2072f7c894dfeee9f3b9c857a10dea5",
+      "instance_id_ceil_2d": "3547d76b85438186ad060f0024f3da75d5f60d34379bf1b58fdd936c1b51b8c4",
+      "best_known_status": "imported_unverified"
     },
     "split": "test",
     "best_known": 29368.0
@@ -3496,7 +3531,14 @@
       "metric": "EUC_2D",
       "sha256": "0de63cddb2a3ae9b10f3eaee4390ece107e2355445cdb5240db65a90eb1fe5fc",
       "opt_tour_rescored": false,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "15f87105524c2e54ae54ea5de94487fa3a3bcb51aa6c20ba1e8429f62ec3beb3",
+      "objective_sibling_group_id": "15f87105524c2e54ae54ea5de94487fa3a3bcb51aa6c20ba1e8429f62ec3beb3",
+      "lineage_group_id": "848c012e5a999b467b908ed5fa522b8e10b0d53a77d7375d52cc2f231f77b8de",
+      "instance_id": "7e2d93900d5472506f975b9d64eda4ce150ec5da23bf8a6e7a56848a26f77f2d",
+      "instance_id_raw_l2": "c956a14119e06cbce2acaca4f0dcca4b6577f8c99ef80c6ff992a47dc67d306e",
+      "instance_id_ceil_2d": "2d6328154d8d73cb3d062a4cb5b3a94ed5bd98babff10f5ed1d9a0252d1fa05f",
+      "best_known_status": "imported_unverified"
     },
     "split": "test",
     "best_known": 42029.0
@@ -4711,7 +4753,14 @@
       "metric": "EUC_2D",
       "sha256": "5d6f56b38a570e6cb30742b5ef112026f18600828a80993c3f047d20760d976f",
       "opt_tour_rescored": false,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "5343627fc535ac145a3b8c856a16782f158bdc6d03c4e78d94a47c048703d48e",
+      "objective_sibling_group_id": "5343627fc535ac145a3b8c856a16782f158bdc6d03c4e78d94a47c048703d48e",
+      "lineage_group_id": "b9bbd48da2cf97ee365a27d1984d4fbe7a9ead679806fad9f62a1b027afa9137",
+      "instance_id": "e1f77c7f58e2224be999c6b33628a749e3588ab858303a763ebc278fd75f7600",
+      "instance_id_raw_l2": "5dd27a52fb5b968f46fcce4dc38d9a9965a05925b7448ff9762818b47bc7da2f",
+      "instance_id_ceil_2d": "73bdaf47f6ff04d2a814cc3e54c1237e092d7cc5ad63b3a94571d9ee918b974d",
+      "best_known_status": "imported_unverified"
     },
     "split": "test",
     "best_known": 48191.0
@@ -7026,7 +7075,14 @@
       "metric": "EUC_2D",
       "sha256": "f6219abf1edc76e50e89126659257ba6d55d16551dcb25d6c6733b8566782ad3",
       "opt_tour_rescored": false,
-      "parser": "tsplib95-euc2d-v1"
+      "parser": "tsplib95-euc2d-v1",
+      "coordinate_parent_id": "59f65cab759afc86dece601c80a6c3e93c69882d4a0a73bf3345980e8095e8b3",
+      "objective_sibling_group_id": "59f65cab759afc86dece601c80a6c3e93c69882d4a0a73bf3345980e8095e8b3",
+      "lineage_group_id": "269aa1352a4f05a8a139617d86dd0325b169d04ffc0a08d45d6412d1a5b72857",
+      "instance_id": "f7b15a41fe8a523a862513f9229d9a68e5d4725cd85827f49f994af9bd76aa17",
+      "instance_id_raw_l2": "6ad2b743a893aab89733e6eb4b51e467160d74e06ea4bccd751eeab0c0c70c8e",
+      "instance_id_ceil_2d": "235b49cd5c53b9353a3307feb91b726f2fe05b687a8f47af4341871c5844d9f5",
+      "best_known_status": "imported_unverified"
     },
     "split": "test",
     "best_known": 36905.0

@@ -26,6 +26,7 @@ from algofinder.benchmark.objectives import (
     get_objective,
     verify_conformance,
 )
+from algofinder.benchmark.sources import CEIL_2D, EUC_2D, RAW_L2
 from algofinder.benchmark.scoring import (
     apply_operation,
     check_relation,
@@ -37,10 +38,6 @@ from algofinder.problems.base import Instance
 from algofinder.problems.tsp import EuclideanTravellingSalespersonProblem
 
 MANIFEST_PATH = Path(__file__).resolve().parents[1] / "data" / "instances" / "tsp_micro_manifests.json"
-
-RAW_L2 = "raw_l2_f64"
-EUC_2D = "tsplib_euc_2d"
-CEIL_2D = "tsplib_ceil_2d"
 
 # Lattice-preserving sibling operations (catalog 3.2: integer-coordinate
 # rotations that do not preserve the lattice are NOT EUC_2D siblings).
@@ -211,22 +208,71 @@ def _validate() -> list[str]:
 
 def _write_manifest() -> int:
     """Write harness-compatible micro manifest; returns instance count."""
+    from algofinder.benchmark.digests import (
+        coordinate_parent_id,
+        instance_id,
+        lineage_group_id,
+        objective_sibling_group_id,
+    )
+    from algofinder.benchmark.references import Reference, ReferenceRegistry
+
     records: list[Instance] = []
+    registry = ReferenceRegistry()
+    provenance = {
+        "source_url": "generated:semantic_micro",
+        "source_name": "semantic_micro",
+        "retrieved_at": "2026-08-02",
+    }
     for name, raw_points in CONFIGURATIONS.items():
         points = np.asarray(raw_points, dtype=float)
         integer = _integer_points(points)
         raw_opt = _exact_optimum(points, RAW_L2)
         euc_opt = _exact_optimum(points, EUC_2D) if integer else None
+        ceil_opt = _exact_optimum(points, CEIL_2D) if integer else None
         data: dict[str, object] = {
             "points": points.tolist(),
             "note": NOTES[name],
             "lineage_group": f"micro:{name}",
+            "coordinate_parent_id": coordinate_parent_id(points),
+            "objective_sibling_group_id": objective_sibling_group_id(points),
+            "lineage_group_id": lineage_group_id(f"micro:{name}"),
+            "instance_id": instance_id(points, EUC_2D),
+            "instance_id_raw_l2": instance_id(points, RAW_L2),
         }
         if euc_opt is not None:
             data["objective_refs"] = {
                 RAW_L2: raw_opt[0] if raw_opt else None,
                 EUC_2D: euc_opt[0],
+                CEIL_2D: ceil_opt[0] if ceil_opt else None,
             }
+        references: list[Reference] = []
+        for spec_id, optimum in (
+            (RAW_L2, raw_opt),
+            (EUC_2D, euc_opt),
+            (CEIL_2D, ceil_opt),
+        ):
+            if optimum is None:
+                continue
+            value, tour = optimum
+            references.append(
+                Reference(
+                    instance_id=data["instance_id"]
+                    if spec_id == EUC_2D
+                    else instance_id(points, spec_id),
+                    objective_spec_id=spec_id,
+                    kind="certified_optimum",
+                    value=float(value),
+                    provenance=dict(provenance),
+                    status="verified",
+                    tour=tuple(tour),
+                    proof={
+                        "method": "held_karp_exact",
+                        "artifact_digest": None,
+                        "independent_verifier": "algofinder.benchmark.scoring",
+                    },
+                )
+            )
+        added = registry.append_many(references)
         records.append(
             Instance(
                 name=f"tsp:micro:{name}",
@@ -239,7 +285,10 @@ def _write_manifest() -> int:
                 split="test",
             )
         )
+        if added:
+            print(f"micro {name:20s} refs=+{added}")
     save_manifest(records, MANIFEST_PATH)
+    registry.write_snapshot()
     return len(records)
 
 
