@@ -46,11 +46,105 @@ MANIFESTS = {
     "dimacs": DATA_DIR / "instances" / "tsp_dimacs_manifests.json",
     "waterloo": DATA_DIR / "instances" / "tsp_waterloo_manifests.json",
     "tetrahedra": DATA_DIR / "instances" / "tsp_tetrahedra_manifests.json",
+    "exact_structure": DATA_DIR / "instances" / "tsp_exact_structure_manifests.json",
+    "anytime_quality": DATA_DIR / "instances" / "tsp_anytime_quality_manifests.json",
+    "ml_ood": DATA_DIR / "instances" / "tsp_ml_ood_manifests.json",
 }
+
+SUITE_INDEX_PATH = DATA_DIR / "instances" / "suite_index.json"
+
+FIT_ROLES = frozenset({"train", "validation"})
+EVAL_SPLITS = frozenset(
+    {"test_iid", "test_family_ood", "test_parameter_ood", "test_metric_ood"}
+)
 
 
 def _load_references() -> list[dict[str, object]]:
     return ReferenceRegistry().load_all()
+
+
+def _audit_generated(suite_names: list[str], lines: list[str], failures: list[str]) -> None:
+    """Phase 3 checks for the compiled strata suites."""
+    for suite_name in suite_names:
+        path = DATA_DIR / "instances" / f"tsp_{suite_name}_manifests.json"
+        if not path.exists():
+            failures.append(f"missing generated manifest: {path}")
+            continue
+        instances = load_manifest(path)
+        bucket_mismatches = 0
+        for instance in instances:
+            points = np.asarray(instance.data["points"], dtype=float)
+            for key, spec in (
+                ("instance_id_raw_l2", RAW_L2),
+                ("instance_id_ceil_2d", CEIL_2D),
+            ):
+                recorded = instance.data.get(key)
+                if recorded is not None and recorded != instance_id(points, spec):
+                    bucket_mismatches += 1
+                    failures.append(
+                        f"{instance.name}: {key} mismatch"
+                    )
+
+        train_lineages = {
+            i.data["lineage_group_id"]
+            for i in instances
+            if (i.split or "test") in FIT_ROLES
+        }
+        eval_lineages = {
+            i.data["lineage_group_id"]
+            for i in instances
+            if (i.split or "test") in EVAL_SPLITS
+        }
+        leakage = train_lineages & eval_lineages
+        if leakage:
+            failures.append(
+                f"{suite_name}: {len(leakage)} lineage groups cross fit/test splits"
+            )
+
+        by_status: dict[str, int] = {}
+        for i in instances:
+            role = i.split or "test"
+            by_status[role] = by_status.get(role, 0) + 1
+        split_summary = ", ".join(
+            f"{role}={by_status[role]}" for role in sorted(by_status)
+        )
+        if suite_name == "exact_structure":
+            if not all(i.best_known is not None for i in instances):
+                failures.append(
+                    "exact_structure: every instance requires an exact "
+                    "best_known (certified optimum)"
+                )
+        if suite_name == "anytime_quality":
+            if not all(i.best_known is not None for i in instances):
+                failures.append(
+                    "anytime_quality: every instance requires an upper bound"
+                )
+        lines.append(
+            f"generated {suite_name:15s} {len(instances):3d} instances "
+            f"({bucket_mismatches} bucket mismatches) splits [{split_summary}]"
+        )
+
+    if not SUITE_INDEX_PATH.exists():
+        failures.append("missing suite index")
+        return
+    index = json.loads(SUITE_INDEX_PATH.read_text())
+    for suite_name in suite_names:
+        entry = index.get(suite_name)
+        if entry is None:
+            failures.append(f"suite index missing {suite_name}")
+            continue
+        path = DATA_DIR / "instances" / entry["manifest"]
+        count = len(load_manifest(path)) if path.exists() else -1
+        lines.append(
+            f"  index {suite_name:15s} idx={entry['instances']:3d} "
+            f"manifest={count:3d} roots={entry['lineage_roots']:3d} "
+            f"cells={entry['cells']:2d}"
+        )
+        if entry["instances"] != count:
+            failures.append(
+                f"suite index mismatch: {suite_name} index={entry['instances']} "
+                f"manifest={count}"
+            )
 
 
 def run_audit() -> list[str]:
@@ -90,6 +184,9 @@ def run_audit() -> list[str]:
             f"{family:10s} {len(instances):3d} instances "
             f"({digest_issues} digest mismatches)"
         )
+
+    generated = ["exact_structure", "anytime_quality", "ml_ood"]
+    _audit_generated(generated, lines, failures)
 
     references = _load_references()
     lines.append(
