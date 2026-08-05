@@ -70,6 +70,8 @@ class Config:
     model_out: Path
     budget_seconds: float | None
     timeout_seconds: float
+    seed: int | None
+    memory_bytes: int | None
     manifests: tuple[str, ...]
     splits: tuple[str, ...]
     solver_include: tuple[str, ...]
@@ -197,6 +199,8 @@ def resolve(
     timeout_seconds = _take(benchmark, "timeout_seconds", default=30.0, kind=float)
     if timeout_seconds <= 0:
         raise ConfigError(f"config: 'timeout_seconds' must be > 0, got {timeout_seconds!r}")
+    seed = _take_nonnegative_int(benchmark, "seed", default=0)
+    memory_bytes = _take_nonnegative_int(benchmark, "memory_bytes", default=0)
     manifests = tuple(
         str(_rel(base, item))
         for item in _take_str_list(benchmark, "manifests")
@@ -257,6 +261,8 @@ def resolve(
         model_out=paths["model_out"],
         budget_seconds=budget_seconds,
         timeout_seconds=timeout_seconds,
+        seed=seed,
+        memory_bytes=memory_bytes,
         manifests=manifests,
         splits=splits,
         solver_include=solver_include,

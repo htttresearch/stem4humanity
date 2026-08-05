@@ -183,6 +183,8 @@ class StrongEuclideanIlsSolver(Solver):
         prepared.sort(key=lambda item: item[0])
         best_tour: Tour | None = prepared[0][1] if prepared else None
         trial_count = len(prepared)
+        if best_tour is not None:
+            _emit_incumbent(context, started, best_tour)
 
         # Phase 2: one ILS chain per seed in sweep-quality order, single
         # pass.  A chain leaves its stagnation exit only when enough
@@ -234,6 +236,7 @@ class StrongEuclideanIlsSolver(Solver):
                     chain_best = tour
                 if tour.cost < best_tour.cost:
                     best_tour = tour
+                    _emit_incumbent(context, started, best_tour)
                     stagnation = 0
                 else:
                     stagnation += 1
@@ -277,6 +280,7 @@ class StrongEuclideanIlsSolver(Solver):
                 _pool_insert(pool, chain_best, self.elite_pool_size)
                 if chain_best.cost < best_tour.cost:
                     best_tour = chain_best
+                    _emit_incumbent(context, started, best_tour)
             add_tour_edges(candidate_lists, chain_best.order, provenance)
             for elite in pool:
                 add_tour_edges(candidate_lists, elite.order, provenance)
@@ -310,6 +314,14 @@ class StrongEuclideanIlsSolver(Solver):
                 **flatten_counters(total_counters),
             },
         )
+
+
+def _emit_incumbent(context: object | None, started: float, tour: Tour) -> None:
+    """Offer the current best tour to the harness incumbent sink."""
+    if context is not None:
+        sink = getattr(context, "incumbents", None)
+        if sink is not None:
+            sink.emit(perf_counter() - started, list(tour.order))
 
 
 def _accumulate(total: dict, stats: dict) -> None:

@@ -46,9 +46,11 @@ def summarize(runs: Iterable[BenchmarkRun]) -> list[dict[str, object]]:
                     "exact": exact,
                     "ok": len(ok_runs),
                     "skipped": len(by_status.get("skipped", [])),
+                    "unsupported": len(by_status.get("unsupported", [])),
                     "error": len(by_status.get("error", [])),
                     "invalid": len(by_status.get("invalid", [])),
                     "timeout": len(by_status.get("timeout", [])),
+                    "memory_limit": len(by_status.get("memory_limit", [])),
                     "mean_gap_percent": mean(gaps) if gaps else None,
                     "mean_wall_seconds": mean(walls) if walls else None,
                     "best_on": len(best_instances),
@@ -71,9 +73,9 @@ def render_leaderboard(runs: Iterable[BenchmarkRun]) -> str:
         sections.append(f"## {problem}:{subproblem}")
         sections.append("")
         sections.append(
-            "| Solver | OK | Mean gap % | Best on | Exact | Mean s | Skipped | Error | Timeout | Invalid |"
+            "| Solver | OK | Mean gap % | Best on | Exact | Mean s | Skipped | Unsupported | Error | Timeout | MemLim | Invalid |"
         )
-        sections.append("|---|---|---|---|---|---|---|---|---|---|")
+        sections.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
         for row in section_rows:
             gap = (
                 f"{row['mean_gap_percent']:.2f}"
@@ -88,8 +90,9 @@ def render_leaderboard(runs: Iterable[BenchmarkRun]) -> str:
             exact = "yes" if row["exact"] else "no"
             sections.append(
                 f"| {row['solver']} | {row['ok']} | {gap} | {row['best_on']} "
-                f"| {exact} | {wall} | {row['skipped']} | {row['error']} "
-                f"| {row['timeout']} | {row['invalid']} |"
+                f"| {exact} | {wall} | {row['skipped']} | {row['unsupported']} "
+                f"| {row['error']} | {row['timeout']} | {row['memory_limit']} "
+                f"| {row['invalid']} |"
             )
         sections.append("")
 
@@ -102,7 +105,8 @@ def render_summary(rows: list[dict[str, object]]) -> str:
     """Per-problem totals: instances, solver-runs, and status counts."""
     total_ok = sum(row["ok"] for row in rows)
     total_cells = sum(
-        row["ok"] + row["skipped"] + row["error"] + row["invalid"] + row["timeout"]
+        row["ok"] + row["skipped"] + row["unsupported"] + row["error"]
+        + row["invalid"] + row["timeout"] + row["memory_limit"]
         for row in rows
     )
     lines = [
@@ -110,8 +114,10 @@ def render_summary(rows: list[dict[str, object]]) -> str:
         f"- solver cells: {total_cells}",
         f"- ok: {total_ok}",
         f"- skipped: {sum(row['skipped'] for row in rows)}",
+        f"- unsupported: {sum(row['unsupported'] for row in rows)}",
         f"- error: {sum(row['error'] for row in rows)}",
         f"- invalid: {sum(row['invalid'] for row in rows)}",
         f"- timeout: {sum(row['timeout'] for row in rows)}",
+        f"- memory_limit: {sum(row['memory_limit'] for row in rows)}",
     ]
     return "\n".join(lines)

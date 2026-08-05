@@ -23,7 +23,14 @@ from typing import Any, Iterable, Literal
 
 from algofinder.problems.base import Instance
 from algofinder.problems.registry import get_problem
-from algofinder.solvers.base import InapplicableError, all_solvers, solvers_for
+from algofinder.harness.runenv import environment_id as _env_id
+from algofinder.harness.runenv import probe
+from algofinder.solvers.base import (
+    InapplicableError,
+    UnsupportedError,
+    all_solvers,
+    solvers_for,
+)
 from algofinder.trace.artifacts import ArtifactStore
 from algofinder.trace.contract import SolveContext
 from algofinder.trace.model import TraceConfig, TraceSummary
@@ -31,7 +38,9 @@ from algofinder.trace.recorder import TraceRecorder
 from algofinder.trace.session import DevSession
 from algofinder.trace.serialize import sha256_hex, strict_dumps
 
-Status = Literal["ok", "skipped", "error", "invalid", "timeout"]
+Status = Literal[
+    "ok", "skipped", "error", "invalid", "timeout", "memory_limit", "unsupported"
+]
 
 
 @dataclass
@@ -52,9 +61,15 @@ class BenchmarkRun:
     gap_percent: float | None = None
     exact: bool | None = None
     wall_seconds: float | None = None
+    cpu_seconds: float | None = None
+    peak_rss_bytes: int | None = None
+    seed: int | None = None
+    memory_bytes: int | None = None
+    environment_id: str | None = None
     error: str | None = None
     solution: list[Any] | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    incumbents: dict[str, Any] | None = None
     session_id: str | None = None
     run_id: str | None = None
     trace_rel: str | None = None
@@ -101,6 +116,9 @@ def _run_cell(
     instance_sha: str,
     state_sha: str,
     problem_id: str,
+    seed: int | None = None,
+    memory_bytes: int | None = None,
+    environment_id: str | None = None,
 ) -> dict[str, Any]:
     """Solve one instance state with one solver; return a JSON-safe outcome.
 
@@ -108,18 +126,32 @@ def _run_cell(
     ``ProblemState`` (numpy-backed classes pickle cleanly) and the
     returned mapping contains only plain Python types. Tracing is
     configured explicitly; nothing is inherited from a parent process.
+
+    ``seed`` selects the solver's random stream where the adapter
+    declares ``seed_control`` other than ``none``. ``memory_bytes`` is a
+    self-reported cap: a run whose peak process-tree RSS exceeds it is
+    recorded as ``memory_limit`` and its (untrusted) solution is
+    discarded, never entering a best-known table or incumbent trace.
     """
     import algofinder.solvers.registry  # noqa: F401  (re-register in workers)
+    from algofinder.trace.incumbent import ValidatedIncumbentSink
 
     started = perf_counter()
+    before = probe()
     outcome: dict[str, Any] = {
         "status": None,
         "cost": None,
         "exact": None,
         "wall_seconds": None,
+        "cpu_seconds": None,
+        "peak_rss_bytes": None,
+        "seed": seed,
+        "memory_bytes": memory_bytes,
+        "environment_id": environment_id,
         "error": None,
         "solution": None,
         "metadata": {},
+        "incumbents": None,
         "trace": None,
     }
     recorder: TraceRecorder | None = None
@@ -139,9 +171,26 @@ def _run_cell(
         outcome["error"] = f"trace setup failed: {type(exc).__name__}: {exc}"
         return outcome
 
+    def _incumbent_observer(t: float, tour: Any, cost: float, tour_id: str) -> None:
+        if trace.enabled:
+            trace.event(
+                "incumbent",
+                "incumbent.found",
+                t=float(t),
+                tour_id=tour_id,
+                cost=float(cost),
+            )
+
+    incumbents = ValidatedIncumbentSink(
+        state, on_incumbent=_incumbent_observer, keep_tours=False
+    )
     solver = all_solvers()[solver_id]()
+    capabilities = solver.capabilities().to_mapping()
     context = SolveContext(
-        run_id=run_id, trace=recorder, budget_seconds=budget_seconds
+        run_id=run_id,
+        trace=recorder,
+        budget_seconds=budget_seconds,
+        incumbents=incumbents,
     )
     trace = context.trace
     contract = getattr(solver, "trace_contract", None)
@@ -155,11 +204,19 @@ def _run_cell(
                 solver_config=solver.config() or _default_config(type(solver)),
                 state_sha=state_sha,
                 instance_sha=instance_sha,
+                capabilities=capabilities,
+                seed=seed,
             )
             store.publish_json("problem-states", _state_encoding(problem_id, state))
             trace.span("problem.snapshot", state_sha=state_sha)
 
         solve_kwargs: dict[str, Any] = {"budget_seconds": budget_seconds}
+        if (
+            seed is not None
+            and capabilities["seed_control"] == "external"
+            and "seed" in inspect.signature(solver.solve).parameters
+        ):
+            solve_kwargs["seed"] = seed
         if "context" in inspect.signature(solver.solve).parameters:
             solve_kwargs["context"] = context
         result = solver.solve(state, **solve_kwargs)
@@ -169,6 +226,17 @@ def _run_cell(
                 solver_cost=float(result.cost),
                 exact=bool(result.exact),
             )
+    except UnsupportedError as exc:
+        if trace.enabled:
+            trace.event(
+                "lifecycle", "run.unsupported", outcome={"reason": str(exc) or exc.__class__.__name__}
+            )
+        outcome["status"] = "unsupported"
+        outcome["error"] = str(exc) or exc.__class__.__name__
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
     except InapplicableError as exc:
         if trace.enabled:
             trace.event(
@@ -176,7 +244,10 @@ def _run_cell(
             )
         outcome["status"] = "skipped"
         outcome["error"] = str(exc) or exc.__class__.__name__
-        return _finish(outcome, recorder, complete=True, coverage_scope=coverage_scope)
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
     except Exception as exc:  # solver crashed on this instance
         if trace.enabled:
             trace.event(
@@ -190,9 +261,39 @@ def _run_cell(
             )
         outcome["status"] = "error"
         outcome["error"] = f"{type(exc).__name__}: {exc}"
-        return _finish(outcome, recorder, complete=True, coverage_scope=coverage_scope)
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
 
+    after = probe()
     outcome["wall_seconds"] = perf_counter() - started
+    outcome["cpu_seconds"] = round(after.cpu_seconds - before.cpu_seconds, 6)
+    outcome["peak_rss_bytes"] = max(0, after.peak_rss_bytes - before.peak_rss_bytes)
+    if (
+        memory_bytes is not None
+        and outcome["peak_rss_bytes"] > memory_bytes
+    ):
+        if trace.enabled:
+            trace.event(
+                "lifecycle",
+                "run.memory_limit",
+                outcome={
+                    "peak_rss_bytes": outcome["peak_rss_bytes"],
+                    "memory_bytes": memory_bytes,
+                },
+            )
+        outcome["status"] = "memory_limit"
+        outcome["error"] = (
+            f"peak RSS {outcome['peak_rss_bytes']} bytes exceeded "
+            f"the {memory_bytes} byte cap"
+        )
+        outcome["solution"] = None
+        outcome["cost"] = None
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
     if trace.enabled:
         trace.span("verify.start")
     if not state.verify(result.solution):
@@ -200,7 +301,10 @@ def _run_cell(
             trace.event("lifecycle", "run.invalid", outcome={"reason": "infeasible"})
         outcome["status"] = "invalid"
         outcome["error"] = "solver returned an infeasible solution"
-        return _finish(outcome, recorder, complete=True, coverage_scope=coverage_scope)
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
     try:
         cost = float(state.objective_value(result.solution))
     except Exception as exc:
@@ -212,7 +316,10 @@ def _run_cell(
             )
         outcome["status"] = "invalid"
         outcome["error"] = f"objective computation failed: {exc}"
-        return _finish(outcome, recorder, complete=True, coverage_scope=coverage_scope)
+        return _finish(
+            outcome, recorder, complete=True, coverage_scope=coverage_scope,
+            incumbents=incumbents,
+        )
 
     outcome["status"] = "ok"
     outcome["cost"] = cost
@@ -227,9 +334,21 @@ def _run_cell(
             solver_cost=float(result.cost),
             exact=bool(result.exact),
             wall_seconds=outcome["wall_seconds"],
+            cpu_seconds=outcome["cpu_seconds"],
+            peak_rss_bytes=outcome["peak_rss_bytes"],
+            seed=seed,
         )
-        trace.span("run.result", status="ok", cost=cost, exact=outcome["exact"])
-    return _finish(outcome, recorder, complete=True, coverage_scope=coverage_scope)
+        trace.span(
+            "run.result",
+            status="ok",
+            cost=cost,
+            exact=outcome["exact"],
+            cpu_seconds=outcome["cpu_seconds"],
+        )
+    return _finish(
+        outcome, recorder, complete=True, coverage_scope=coverage_scope,
+        incumbents=incumbents,
+    )
 
 
 def _state_encoding(problem_id: str, state: Any) -> dict[str, Any]:
@@ -245,8 +364,11 @@ def _finish(
     *,
     complete: bool,
     coverage_scope: str | None = None,
+    incumbents: Any = None,
 ) -> dict[str, Any]:
     """Close the recorder (if any) and attach the trace summary."""
+    if incumbents is not None:
+        outcome["incumbents"] = incumbents.summary()
     if recorder is not None:
         summary = recorder.close(complete=complete).to_mapping()
         if coverage_scope is not None:
@@ -293,6 +415,12 @@ def _build_run(
             run.gap_percent = problem.gap_percent(
                 run.cost, float(instance.best_known)
             )
+    run.cpu_seconds = outcome.get("cpu_seconds")
+    run.peak_rss_bytes = outcome.get("peak_rss_bytes")
+    run.seed = outcome.get("seed")
+    run.memory_bytes = outcome.get("memory_bytes")
+    run.environment_id = outcome.get("environment_id") or _env_id()
+    run.incumbents = outcome.get("incumbents")
     return run
 
 
@@ -355,6 +483,9 @@ def run_benchmark(
     session: DevSession | None = None,
     solver_include: tuple[str, ...] = (),
     solver_exclude: tuple[str, ...] = (),
+    seed: int | None = None,
+    memory_bytes: int | None = None,
+    environment_id: str | None = None,
 ) -> list[BenchmarkRun]:
     """Run every applicable solver on every requested instance.
 
@@ -362,6 +493,12 @@ def run_benchmark(
     termination where implemented); ``timeout_seconds`` is a hard
     wall-clock cap per (instance, solver) cell, enforced by running the
     cell in a worker process that is terminated when it fires.
+
+    ``seed`` selects each solver's random stream when the adapter
+    declares ``seed_control`` (the harness treats every seed as an
+    independent individual run, spec 8.2). ``memory_bytes`` is a
+    self-reported process-tree RSS cap (spec 9.2): runs over the cap are
+    recorded as ``memory_limit`` with no accepted solution.
 
     With a ``session`` (dev mode), every cell gets a reserved run ID,
     an invocation written before the worker starts, and an authoritative
@@ -375,6 +512,13 @@ def run_benchmark(
 
     trace_config = session.trace_config() if session else TraceConfig(enabled=False)
     session_root = str(session.dir) if session else None
+    env_id = environment_id or _env_id()
+
+    cell_defaults = (
+        seed,
+        memory_bytes,
+        env_id,
+    )
 
     try:
         for instance in instances:
@@ -401,6 +545,9 @@ def run_benchmark(
                         solver_display=solver_cls.display,
                         solver_config=_default_config(solver_cls),
                         budget_seconds=budget_seconds,
+                        seed=seed,
+                        memory_bytes=memory_bytes,
+                        environment_id=env_id,
                     )
                 if pool is None:
                     outcome = _run_cell(
@@ -409,6 +556,7 @@ def run_benchmark(
                         invocation.run_id if invocation else "",
                         session.session_id if session else None,
                         instance_sha, state_sha, instance.problem,
+                        *cell_defaults,
                     )
                 else:
                     future = pool.apply_async(
@@ -419,7 +567,8 @@ def run_benchmark(
                             invocation.run_id if invocation else "",
                             session.session_id if session else None,
                             instance_sha, state_sha, instance.problem,
-                        ),
+                        )
+                        + cell_defaults,
                     )
                     try:
                         outcome = future.get(timeout=timeout_seconds)
@@ -431,6 +580,11 @@ def run_benchmark(
                             "cost": None,
                             "exact": None,
                             "wall_seconds": float(timeout_seconds),
+                            "cpu_seconds": None,
+                            "peak_rss_bytes": None,
+                            "seed": seed,
+                            "memory_bytes": memory_bytes,
+                            "environment_id": env_id,
                             "error": (
                                 f"exceeded the {timeout_seconds:g}s "
                                 "wall-clock timeout"
@@ -467,6 +621,11 @@ def run_benchmark(
                         cost_harness=outcome.get("cost"),
                         exact=outcome.get("exact"),
                         wall_seconds=outcome.get("wall_seconds"),
+                        cpu_seconds=outcome.get("cpu_seconds"),
+                        peak_rss_bytes=outcome.get("peak_rss_bytes"),
+                        seed=outcome.get("seed"),
+                        memory_bytes=outcome.get("memory_bytes"),
+                        environment_id=outcome.get("environment_id"),
                         error=outcome.get("error"),
                         solution=outcome.get("solution"),
                         metadata=outcome.get("metadata"),

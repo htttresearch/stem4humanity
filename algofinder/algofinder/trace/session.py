@@ -129,6 +129,9 @@ class DevSession:
         solver_display: str,
         solver_config: dict[str, Any],
         budget_seconds: float | None,
+        seed: int | None = None,
+        memory_bytes: int | None = None,
+        environment_id: str | None = None,
     ) -> Invocation:
         """Reserve a run ID and write its invocation before the worker starts."""
         self._run_counter += 1
@@ -150,6 +153,9 @@ class DevSession:
             solver_config=solver_config,
             budget_seconds=budget_seconds,
             trace_profile=self.profile,
+            seed=seed,
+            memory_bytes=memory_bytes,
+            environment_id=environment_id,
             created_utc=datetime.now(timezone.utc).isoformat(),
         )
         (run_dir / "invocation.json").write_text(
@@ -180,6 +186,11 @@ class DevSession:
         cost_harness: float | None = None,
         exact: bool | None = None,
         wall_seconds: float | None = None,
+        cpu_seconds: float | None = None,
+        peak_rss_bytes: int | None = None,
+        seed: int | None = None,
+        memory_bytes: int | None = None,
+        environment_id: str | None = None,
         error: str | None = None,
         solution: Any = None,
         metadata: dict[str, Any] | None = None,
@@ -195,6 +206,11 @@ class DevSession:
             "cost_harness": cost_harness,
             "exact": exact,
             "wall_seconds": wall_seconds,
+            "cpu_seconds": cpu_seconds,
+            "peak_rss_bytes": peak_rss_bytes,
+            "seed": seed,
+            "memory_bytes": memory_bytes,
+            "environment_id": environment_id,
             "error": error,
             "solution": solution,
             "solver_metadata": metadata or {},
