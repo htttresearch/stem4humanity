@@ -1,0 +1,9 @@
+algorithm_cutoff_time = 60.0
+algorithm_cutoff_memory = 1073741824
+extended_feature_set = true
+scenario = algofinder
+feature_steps = params@1,etsp-geometry@1
+performance_measure = minimized_solution_quality
+number_of_instances = 144
+number_of_algorithms = 32
+number_of_features = 1016

@@ -5,9 +5,10 @@ Usage::
     python -m algofinder.harness.runner --config config/config.toml generate   # build manifests
     python -m algofinder.harness.runner --config config/config.toml train      # train the ML solvers
     python -m algofinder.harness.runner --config config/config.toml benchmark  # run all solvers
+    python -m algofinder.harness.runner --config config/config.toml features   # compute per-instance features
     python -m algofinder.harness.runner --config config/config.toml index      # rebuild registry + DuckDB query layer
     python -m algofinder.harness.runner --config config/config.toml report     # render leaderboard
-    python -m algofinder.harness.runner --config config/config.toml all        # generate + train + benchmark + index + report
+    python -m algofinder.harness.runner --config config/config.toml all        # generate + train + benchmark + features + index + report
 
 ``--config`` may appear before or after the subcommand.  The config
 file (see ``config/config.toml``) supplies every default; explicit
@@ -81,6 +82,16 @@ def command_generate(args: argparse.Namespace, cfg: Config) -> None:
             best_known_budget_seconds=cfg.best_known_budget_seconds,
         )
         _log(cfg, f"generated: {module_name}.{function_name} -> {output_dir}")
+    if getattr(args, "fill_features", False):
+        from algofinder.features.fill import generate_fill_instances
+
+        summary = generate_fill_instances(output_dir)
+        _log(
+            cfg,
+            f"feature-fill: {summary['instances']} instances from "
+            f"{summary['bins']} bins -> {summary['manifest']} "
+            f"(skipped {summary['skipped_duplicates']} duplicates)",
+        )
     _log(cfg, f"manifests written to {output_dir}")
 
 
@@ -147,6 +158,72 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
     _log(cfg, f"wrote {len(runs)} runs to {output}")
 
 
+def command_features(args: argparse.Namespace, cfg: Config) -> None:
+    from algofinder.features import enabled_feature_sets
+    from algofinder.features.storage import features_dir, write_feature_set
+
+    instances = _load_instances(args.manifest, cfg.instances_dir)
+    feature_sets = enabled_feature_sets(
+        {"enabled": cfg.feature_sets} if cfg.feature_sets else None
+    )
+    if not feature_sets:
+        raise SystemExit("no feature sets enabled; add [features] enabled to the config")
+    _log(
+        cfg,
+        f"computing features for {len(instances)} instances "
+        f"(sets={[feature_set.id for feature_set in feature_sets]})",
+    )
+    for feature_set in feature_sets:
+        path = write_feature_set(cfg.instances_dir, feature_set, instances)
+        records = path.read_text(encoding="utf-8").count("\n")
+        _log(cfg, f"wrote {records} records to {path}")
+    _log(cfg, f"features written to {features_dir(cfg.instances_dir)}")
+
+
+def command_audit(args: argparse.Namespace, cfg: Config) -> None:
+    import json as _json
+
+    from algofinder.report.audit import audit_corpus, render_audit
+
+    summary = audit_corpus(cfg.instances_dir)
+    output = Path(args.out)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(render_audit(summary) + "\n")
+    json_path = output.with_suffix(".json")
+    json_path.write_text(_json.dumps(summary, indent=2) + "\n")
+    _log(cfg, f"audit written to {output} and {json_path}")
+    _log(cfg, render_audit(summary))
+
+
+def command_portfolio(args: argparse.Namespace, cfg: Config) -> None:
+    import json as _json
+
+    from algofinder.harness.benchmark import BenchmarkRun
+    from algofinder.report.portfolio import portfolio, render_portfolio
+
+    instances = _load_instances(args.manifest, cfg.instances_dir)
+    record = _json.loads(Path(args.runs).read_text())
+    runs = [BenchmarkRun(**mapping) for mapping in record["runs"]]
+    summary = portfolio(runs, instances, cfg.instances_dir)
+    output = Path(args.out)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(render_portfolio(summary) + "\n")
+    _log(cfg, f"portfolio written to {output}")
+    _log(cfg, render_portfolio(summary))
+
+
+def command_export_aslib(args: argparse.Namespace, cfg: Config) -> None:
+    import json as _json
+
+    from algofinder.harness.benchmark import BenchmarkRun
+    from algofinder.report.aslib import export_aslib
+
+    record = _json.loads(Path(args.runs).read_text())
+    runs = [BenchmarkRun(**mapping) for mapping in record["runs"]]
+    summary = export_aslib(runs, cfg.instances_dir, cfg.aslib_dir)
+    _log(cfg, "aslib scenario: " + ", ".join(f"{k}={v}" for k, v in summary.items()))
+
+
 def command_report(args: argparse.Namespace, cfg: Config) -> None:
     from algofinder.harness.benchmark import BenchmarkRun
     from algofinder.harness.leaderboard import render_leaderboard
@@ -177,7 +254,8 @@ def command_index(args: argparse.Namespace, cfg: Config) -> None:
     _log(
         cfg,
         f"registry: instances={counts['instances']} solvers={counts['solvers']} "
-        f"runs={counts['runs']} environments={counts['environments']}",
+        f"runs={counts['runs']} environments={counts['environments']} "
+        f"features={counts.get('features', 0)}",
     )
     db = summary["db"]
     _log(
@@ -271,6 +349,7 @@ def command_all(args: argparse.Namespace, cfg: Config) -> None:
         "generate": lambda: command_generate(args, cfg),
         "train": lambda: command_train(args, cfg),
         "benchmark": lambda: command_benchmark(args, cfg),
+        "features": lambda: command_features(args, cfg),
         "index": lambda: command_index(args, cfg),
     }
     for step in cfg.pipeline_steps:
@@ -313,6 +392,13 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
         type=str,
         default=str(cfg.instances_dir),
         help=f"manifest output directory (default: {cfg.instances_dir})",
+    )
+    generate.add_argument(
+        "--fill-features",
+        action="store_true",
+        default=False,
+        help="also generate deterministic feature-fill instances "
+        "(train-split only, never final-evaluated)",
     )
     generate.set_defaults(func=lambda args: command_generate(args, cfg))
 
@@ -455,9 +541,71 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
     )
     train.set_defaults(func=lambda args: command_train(args, cfg))
 
+    features = subparsers.add_parser(
+        "features", help="compute and store per-instance feature records"
+    )
+    _config_flags(features)
+    features.add_argument(
+        "--manifest",
+        action="append",
+        default=list(cfg.manifests),
+        help="manifest file (repeatable; defaults to config 'manifests' "
+        "or all under the instances dir)",
+    )
+    features.set_defaults(func=lambda args: command_features(args, cfg))
+
+    audit = subparsers.add_parser(
+        "audit", help="coverage audit of instances and feature sets"
+    )
+    _config_flags(audit)
+    audit.add_argument(
+        "--out",
+        type=str,
+        default=str(cfg.audit_out),
+        help=f"audit markdown output (config default: {cfg.audit_out})",
+    )
+    audit.set_defaults(func=lambda args: command_audit(args, cfg))
+
+    portfolio = subparsers.add_parser(
+        "portfolio", help="virtual-best and regret report over benchmark runs"
+    )
+    _config_flags(portfolio)
+    portfolio.add_argument(
+        "--manifest",
+        action="append",
+        default=list(cfg.manifests),
+        help="manifest file (repeatable; defaults to config 'manifests' "
+        "or all under the instances dir)",
+    )
+    portfolio.add_argument(
+        "--runs",
+        type=str,
+        default=str(cfg.benchmark_out),
+        help=f"benchmark results file (config default: {cfg.benchmark_out})",
+    )
+    portfolio.add_argument(
+        "--out",
+        type=str,
+        default=str(cfg.portfolio_out),
+        help=f"portfolio output (config default: {cfg.portfolio_out})",
+    )
+    portfolio.set_defaults(func=lambda args: command_portfolio(args, cfg))
+
+    export_aslib = subparsers.add_parser(
+        "export-aslib", help="export the corpus as an ASlib scenario"
+    )
+    _config_flags(export_aslib)
+    export_aslib.add_argument(
+        "--runs",
+        type=str,
+        default=str(cfg.benchmark_out),
+        help=f"benchmark results file (config default: {cfg.benchmark_out})",
+    )
+    export_aslib.set_defaults(func=lambda args: command_export_aslib(args, cfg))
+
     all_command = subparsers.add_parser(
         "all", help="run the configured pipeline steps "
-        "(generate, train, benchmark, report)"
+        "(generate, train, benchmark, features, index, report)"
     )
     _config_flags(all_command)
     all_command.add_argument(

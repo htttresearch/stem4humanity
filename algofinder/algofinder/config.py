@@ -30,7 +30,7 @@ DEFAULT_CONFIG_PATH = CONFIG_DIR / "config.toml"
 MODES = ("dev", "prod")
 TRACE_PROFILES = ("full", "decisions", "summary")
 SPLITS = ("train", "test")
-PIPELINE_STEPS = ("generate", "train", "benchmark", "index", "report")
+PIPELINE_STEPS = ("generate", "train", "benchmark", "features", "index", "report")
 
 DEFAULT_PATHS = {
     "instances_dir": "public/data",
@@ -44,6 +44,10 @@ DEFAULT_PATHS = {
     "db_dir": "private/db",
     "db_path": "private/db/analytics.duckdb",
     "cache_dir": "private/db/cache",
+    "reports_dir": "private/reports",
+    "audit_out": "private/reports/audit.md",
+    "portfolio_out": "public/results/portfolio.md",
+    "aslib_dir": "public/benchmarks/aslib",
 }
 
 DEFAULT_PROFILES = {
@@ -76,8 +80,13 @@ class Config:
     db_dir: Path
     db_path: Path
     cache_dir: Path
+    reports_dir: Path
+    audit_out: Path
+    portfolio_out: Path
+    aslib_dir: Path
     results_glob: str
     parity: bool
+    feature_sets: tuple[str, ...]
     budget_seconds: float | None
     timeout_seconds: float
     seed: int | None
@@ -167,7 +176,7 @@ def resolve(
     profile_override: str | None = None,
 ) -> Config:
     """Resolve a parsed TOML document into a validated :class:`Config`."""
-    allowed_top = {"profile", "profiles", "paths", "instances", "benchmark", "pipeline", "runtime", "ml", "store"}
+    allowed_top = {"profile", "profiles", "paths", "instances", "benchmark", "pipeline", "runtime", "ml", "store", "features"}
     unknown = set(raw) - allowed_top
     if unknown:
         raise ConfigError(f"config: unknown section(s) {sorted(unknown)}")
@@ -251,6 +260,15 @@ def resolve(
     results_glob = _take(store, "results_glob", default="*.json", kind=str)
     parity = _take(store, "parity", default=True, kind=bool)
 
+    features = _require_table(raw, "features")
+    feature_sets = _take_str_list(features, "enabled")
+    for feature_set in feature_sets:
+        if feature_set not in ("params@1", "etsp-geometry@1"):
+            raise ConfigError(
+                f"config: 'features.enabled' entries must be one of "
+                f"params@1, etsp-geometry@1, got {feature_set!r}"
+            )
+
     ml = _require_table(raw, "ml")
     n_estimators = _take(ml, "n_estimators", default=250, kind=int)
     if n_estimators <= 0:
@@ -277,8 +295,13 @@ def resolve(
         db_dir=paths["db_dir"],
         db_path=paths["db_path"],
         cache_dir=paths["cache_dir"],
+        reports_dir=paths["reports_dir"],
+        audit_out=paths["audit_out"],
+        portfolio_out=paths["portfolio_out"],
+        aslib_dir=paths["aslib_dir"],
         results_glob=results_glob,
         parity=parity,
+        feature_sets=feature_sets,
         budget_seconds=budget_seconds,
         timeout_seconds=timeout_seconds,
         seed=seed,

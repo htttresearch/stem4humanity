@@ -1,0 +1,1 @@
+algofinder benchmark corpus: instance features (tier-0 params@1, tier-1 etsp-geometry@1) and minimized solution cost per algorithm. Folds are split-derived (0=train, 1=test) and never mix splits.

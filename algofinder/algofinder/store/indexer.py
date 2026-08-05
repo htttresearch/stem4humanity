@@ -18,6 +18,7 @@ from typing import Any, Iterable
 
 import duckdb
 
+from algofinder.features.storage import find_feature_files
 from algofinder.store.canonical import (
     SCHEMA_VERSION,
     find_instances_manifests,
@@ -129,6 +130,50 @@ def _environment_entries(results_files: Iterable[str | Path]) -> list[dict[str, 
     return entries
 
 
+def _feature_entries(
+    instances_dir: str | Path,
+) -> list[dict[str, Any]]:
+    """Registry entries for canonical feature-record files."""
+    entries: list[dict[str, Any]] = []
+    for path in find_feature_files(instances_dir):
+        records = _read_jsonl(path)
+        for record in records:
+            stable = {
+                "instance_id": record.get("instance_id"),
+                "feature_set_id": record.get("feature_set_id"),
+                "extractor_digest": record.get("extractor_digest"),
+                "values": record.get("values"),
+                "status_by_feature": record.get("status_by_feature"),
+            }
+            entries.append(
+                {
+                    "id": run_digest(stable),
+                    "instance_id": record.get("instance_id"),
+                    "feature_set_id": record.get("feature_set_id"),
+                    "tier": record.get("tier"),
+                    "extractor_digest": record.get("extractor_digest"),
+                    "status": sorted(record.get("status_by_feature", {})),
+                    "source": str(path),
+                    "file_sha256": sha256_file(path),
+                    "schema_version": SCHEMA_VERSION,
+                }
+            )
+    return _dedupe(entries)
+
+
+def _read_jsonl(path: str | Path) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    with open(path, encoding="utf-8") as handle:
+        for line_no, raw in enumerate(handle, start=1):
+            if not raw.strip():
+                continue
+            try:
+                records.append(json.loads(raw))
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"{path}:{line_no}: invalid JSON: {exc}") from exc
+    return records
+
+
 def _dedupe(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     seen: set[str] = set()
     unique: list[dict[str, Any]] = []
@@ -156,6 +201,7 @@ def build_registry(
         ("solvers", _solver_entries()),
         ("runs", _run_entries(results_files)),
         ("environments", _environment_entries(results_files)),
+        ("features", _feature_entries(instances_dir)),
     ):
         ordered = write_kind(registry_dir, kind, entries)
         counts[kind] = len(ordered)
@@ -189,8 +235,6 @@ def verify_registry(
 
 def _results_glob_paths(results_dir: str | Path, results_glob: str) -> list[str]:
     return [str(path) for path in find_results_files(results_dir, results_glob)]
-
-
 def build_db(
     *,
     results_dir: str | Path,
@@ -245,6 +289,24 @@ def build_db(
                 + _list_literal([str(registry_path)])
                 + ")"
             )
+        feature_files = sorted(
+            str(path) for path in find_feature_files(instances_dir)
+        )
+        if feature_files:
+            con.execute(
+                "CREATE OR REPLACE VIEW v_features AS SELECT * FROM read_json_auto("
+                + _list_literal(feature_files)
+                + ")"
+            )
+            con.execute(
+                f"COPY (SELECT * FROM v_features) TO '{_cache(cache_dir, 'features')}' "
+                "(FORMAT PARQUET, COMPRESSION ZSTD, ROW_GROUP_SIZE 100000, "
+                "OVERWRITE_OR_IGNORE)"
+            )
+            con.execute(
+                "CREATE OR REPLACE VIEW v_features_cache AS "
+                "SELECT * FROM read_parquet(" + _list_literal([str(_cache(cache_dir, "features"))]) + ")"
+            )
         for kind in ("solvers", "environments"):
             _create_registry_view(con, registry, kind)
     finally:
@@ -252,7 +314,7 @@ def build_db(
 
     counts: dict[str, int] = {}
     with duckdb.connect(str(db_path)) as con:
-        for name in ("v_runs", "v_instances", "v_references", "v_solvers", "v_environments"):
+        for name in ("v_runs", "v_instances", "v_references", "v_solvers", "v_environments", "v_features"):
             try:
                 counts[name] = con.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
             except Exception:
