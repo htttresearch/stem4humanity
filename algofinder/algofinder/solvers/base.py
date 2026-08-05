@@ -17,6 +17,14 @@ class InapplicableError(Exception):
     """
 
 
+class UnsupportedError(InapplicableError):
+    """A solver cannot run here (missing binary, platform, or capability).
+
+    Recorded as ``unsupported`` (spec 6.6 status taxonomy) rather than
+    ``error``: the row exists but carries no solution.
+    """
+
+
 @dataclass
 class SolverResult:
     """A feasible solution returned by a solver."""
@@ -26,6 +34,42 @@ class SolverResult:
     exact: bool
     wall_seconds: float
     metadata: dict[str, Any] = field(default_factory=dict)
+    seed: int | None = None
+
+
+@dataclass(frozen=True)
+class SolverCapabilities:
+    """Public adapter capabilities (benchmark spec section 8).
+
+    Capabilities describe what an adapter can do, not config details:
+    the harness owns resource caps and final scoring; web adapters
+    translate, launch, capture outputs, and expose incumbent events.
+    """
+
+    roles: tuple[str, ...] = ("upper_bound",)
+    objective_specs: tuple[str, ...] = ()
+    interruptible: bool = False
+    streams_incumbents: bool = False
+    seed_control: str = "external"  # deterministic | external | none
+    memory_control: bool = False
+    native_work_counters: bool = False
+    proof_artifacts: bool = False
+    max_dimension: int | None = None
+    binary_name: str | None = None
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "roles": list(self.roles),
+            "objective_specs": list(self.objective_specs),
+            "interruptible": self.interruptible,
+            "streams_incumbents": self.streams_incumbents,
+            "seed_control": self.seed_control,
+            "memory_control": self.memory_control,
+            "native_work_counters": self.native_work_counters,
+            "proof_artifacts": self.proof_artifacts,
+            "max_dimension": self.max_dimension,
+            "binary_name": self.binary_name,
+        }
 
 
 class Solver(ABC):
@@ -77,12 +121,38 @@ class Solver(ABC):
         return result
 
     def describe(self) -> dict[str, Any]:
-        """Reproducibility metadata: identifier, config, and version."""
+        """Reproducibility metadata: identifier, config, and capabilities."""
         return {
             "id": self.id,
             "tags": sorted(self.tags),
             "config": self.config(),
+            "capabilities": self.capabilities().to_mapping(),
         }
+
+    def capabilities(self) -> SolverCapabilities:
+        """Declared adapter capabilities (spec section 8).
+
+        Default inference: a solver that stores a constructor ``seed``
+        is deterministic (its seed is fixed by config); otherwise the
+        harness treats it as uncontrolled and never passes a run seed.
+        """
+        tags = self.tags
+        roles: list[str] = []
+        if "exact" in tags:
+            roles.append("exact")
+        if "heuristic" in tags:
+            roles.append("upper_bound")
+        if "ml" in tags:
+            roles.append("selector")
+        if "control" in tags:
+            roles.append("constructor")
+        seed_control = "deterministic" if hasattr(self, "seed") else "none"
+        return SolverCapabilities(
+            roles=tuple(roles) or ("upper_bound",),
+            interruptible=True,
+            streams_incumbents=False,
+            seed_control=seed_control,
+        )
 
 
 _SOLVERS: dict[str, type[Solver]] = {}

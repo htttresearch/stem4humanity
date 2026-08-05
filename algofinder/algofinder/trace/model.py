@@ -58,6 +58,9 @@ class Invocation:
     solver_config: dict[str, Any] = field(default_factory=dict)
     budget_seconds: float | None = None
     trace_profile: str = "off"
+    seed: int | None = None
+    memory_bytes: int | None = None
+    environment_id: str | None = None
     created_utc: str = ""
 
 

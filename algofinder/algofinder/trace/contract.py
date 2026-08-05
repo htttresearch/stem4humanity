@@ -61,9 +61,17 @@ class SolveContext:
     ``trace`` is either a :class:`TraceRecorder` (dev) or the null
     recorder (prod). ``budget`` is the cooperative time budget; solvers
     may use it instead of private perf_counter deadlines.
+    ``incumbents`` is the validated incumbent sink (spec 6.6): solvers
+    emit candidates there; only feasible, improving tours are accepted.
     """
 
-    __slots__ = ("run_id", "trace", "budget_seconds", "_component")
+    __slots__ = (
+        "run_id",
+        "trace",
+        "budget_seconds",
+        "incumbents",
+        "_component",
+    )
 
     def __init__(
         self,
@@ -71,12 +79,17 @@ class SolveContext:
         run_id: str | None = None,
         trace: Any = None,
         budget_seconds: float | None = None,
+        incumbents: Any = None,
     ) -> None:
+        from algofinder.trace.incumbent import NullIncumbentSink
         from algofinder.trace.recorder import NullTraceRecorder
 
         self.run_id = run_id
         self.trace = trace if trace is not None else NullTraceRecorder()
         self.budget_seconds = budget_seconds
+        self.incumbents = (
+            incumbents if incumbents is not None else NullIncumbentSink()
+        )
         self._component = "solve"
 
     def child(self, component: str) -> "SolveContext":
@@ -84,6 +97,7 @@ class SolveContext:
             run_id=self.run_id,
             trace=self.trace.child(component),
             budget_seconds=self.budget_seconds,
+            incumbents=self.incumbents,
         )
         child._component = component
         return child

@@ -89,7 +89,8 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
 
     session: DevSession | None = None
     trace_profile = getattr(args, "profile", None) or cfg.trace_profile
-    if cfg.mode == "dev":
+    mode = getattr(args, "mode", None) or cfg.mode
+    if mode == "dev":
         session = DevSession(
             cfg.sessions_dir,
             profile=trace_profile,
@@ -106,6 +107,7 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
         cfg,
         f"benchmarking {len(instances)} instances "
         f"(budget={args.budget_seconds}s, timeout={args.timeout_seconds}s, "
+        f"seed={args.seed}, memory={args.memory_bytes} bytes, "
         f"mode={cfg.mode}, splits={cfg.splits})",
     )
     try:
@@ -117,6 +119,8 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
             session=session,
             solver_include=cfg.solver_include,
             solver_exclude=cfg.solver_exclude,
+            seed=args.seed,
+            memory_bytes=args.memory_bytes,
         )
     finally:
         if session is not None:
@@ -126,6 +130,8 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
             "profile": cfg.profile,
             "budget_seconds": args.budget_seconds,
             "timeout_seconds": args.timeout_seconds,
+            "seed": args.seed,
+            "memory_bytes": args.memory_bytes,
             "mode": cfg.mode,
             "splits": list(cfg.splits),
             "trace_profile": trace_profile,
@@ -304,6 +310,21 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
         f"(config default: {cfg.mode})",
     )
     benchmark.add_argument(
+        "--seed",
+        type=int,
+        default=cfg.seed,
+        help="solver random seed for adapters that declare seed control "
+        f"(config default: {cfg.seed})",
+    )
+    benchmark.add_argument(
+        "--memory-bytes",
+        type=int,
+        default=cfg.memory_bytes,
+        help="self-reported process-tree RSS cap in bytes; runs above it "
+        "are recorded as memory_limit with no accepted solution "
+        f"(config default: {cfg.memory_bytes})",
+    )
+    benchmark.add_argument(
         "--profile",
         type=str,
         choices=["full", "decisions", "summary"],
@@ -402,6 +423,19 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
         type=float,
         default=cfg.timeout_seconds,
         help="hard wall-clock cap per (instance, solver) cell",
+    )
+    all_command.add_argument(
+        "--seed",
+        type=int,
+        default=cfg.seed,
+        help="solver random seed (config default: {})".format(cfg.seed),
+    )
+    all_command.add_argument(
+        "--memory-bytes",
+        type=int,
+        default=cfg.memory_bytes,
+        help="process-tree RSS cap in bytes (config default: "
+        f"{cfg.memory_bytes})",
     )
     all_command.add_argument(
         "--out",
