@@ -138,6 +138,16 @@ db_dir = "private/db"
 db_path = "private/db/analytics.duckdb"
 cache_dir = "private/db/cache"
 
+# Where `audit` writes the corpus coverage report (private).
+reports_dir = "private/reports"
+audit_out = "private/reports/audit.md"
+
+# Where `portfolio` writes the virtual-best/regret report (published).
+portfolio_out = "public/results/portfolio.md"
+
+# Where `export-aslib` writes the ASlib scenario (published benchmarks).
+aslib_dir = "public/benchmarks/aslib"
+
 # ============================================================================
 #  INSTANCES — how manifests are generated
 # ============================================================================
@@ -187,7 +197,23 @@ solver_exclude = []
 #  `all` runs these steps in order.  Remove a step to skip it, e.g. to
 #  benchmark and report without regenerating instances or retraining.
 [pipeline]
-steps = ["generate", "train", "benchmark", "index", "report"]
+steps = ["generate", "train", "benchmark", "features", "index", "report"]
+
+# ============================================================================
+#  FEATURES — per-instance feature records (phase 6)
+# ============================================================================
+# Feature sets computed by the `features` pipeline step and stored as
+# canonical records under `paths.instances_dir`/features/.
+#
+#   params@1          tier-0 descriptor features for every instance
+#                     (seed, size proxy, per-key data shapes)
+#   etsp-geometry@1   tier-1 Euclidean-TSP geometry features (hull
+#                     fraction, normalized MST weight, NN stats,
+#                     candidate-degree stats, span stats)
+#
+# Empty list (default) = every declared feature set is enabled.
+[features]
+enabled = []
 
 # ============================================================================
 #  STORE — the indexer (query layer over the canonical store)

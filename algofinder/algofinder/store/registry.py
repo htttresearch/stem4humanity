@@ -1,7 +1,7 @@
 """Append-only registry: an inventory of what exists (tier 2).
 
 One JSONL file per kind (``instances``, ``solvers``, ``runs``,
-``environments``). The indexer regenerates each file deterministically —
+``environments``, ``features``). The indexer regenerates each file deterministically —
 entries are written sorted by id, so a rerun over unchanged canonical
 files produces byte-identical logs. The registry is *derived*: it indexes
 the canonical store and is always rebuildable from it, but its digests
@@ -19,7 +19,7 @@ from algofinder.trace.serialize import strict_dumps
 
 SCHEMA_VERSION = "algofinder.registry.v1"
 
-KINDS = ("instances", "solvers", "runs", "environments")
+KINDS = ("instances", "solvers", "runs", "environments", "features")
 
 
 class RegistryError(ValueError):
