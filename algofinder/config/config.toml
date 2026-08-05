@@ -127,6 +127,17 @@ leaderboard_out = "public/results/leaderboard.md"
 # Primary ML model (the candidate ranker) output of `train`.
 model_out = "public/models/candidate_ranker.joblib"
 
+# Where the indexer writes the registry (append-only JSONL inventory of
+# what exists: instances, solvers, runs, environments).
+registry_dir = "private/registry"
+
+# Where the indexer builds the DuckDB query layer (views over the
+# canonical files plus regenerable Parquet caches).  Both are gitignored
+# and always rebuildable from the canonical store.
+db_dir = "private/db"
+db_path = "private/db/analytics.duckdb"
+cache_dir = "private/db/cache"
+
 # ============================================================================
 #  INSTANCES — how manifests are generated
 # ============================================================================
@@ -176,7 +187,20 @@ solver_exclude = []
 #  `all` runs these steps in order.  Remove a step to skip it, e.g. to
 #  benchmark and report without regenerating instances or retraining.
 [pipeline]
-steps = ["generate", "train", "benchmark", "report"]
+steps = ["generate", "train", "benchmark", "index", "report"]
+
+# ============================================================================
+#  STORE — the indexer (query layer over the canonical store)
+# ============================================================================
+[store]
+# Glob of benchmark result files under `paths.results_dir` that the
+# indexer treats as canonical run records.
+results_glob = "*.json"
+
+# After rebuilding the registry and DuckDB layer, verify that the
+# SQL-derived leaderboard numbers match the Python renderer exactly.
+# A mismatch fails the `index` step loudly.
+parity = true
 
 # ============================================================================
 #  RUNTIME — harness behaviour
