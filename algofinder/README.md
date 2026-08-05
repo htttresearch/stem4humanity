@@ -59,9 +59,19 @@ pip install -e ".[dev]"    # optional: pytest
 python -m algofinder.harness.runner generate    # build all instance manifests
 python -m algofinder.harness.runner train       # train the ML solvers
 python -m algofinder.harness.runner benchmark   # run every applicable solver
+python -m algofinder.harness.runner index       # rebuild registry + DuckDB query layer
 python -m algofinder.harness.runner report      # render the leaderboard
-python -m algofinder.harness.runner all         # generate + train + benchmark + report
+python -m algofinder.harness.runner all         # generate + train + benchmark + index + report
 ```
+
+`index` (storage design A) regenerates the append-only registry
+(`private/registry/`, an inventory of instances, solvers, runs, and
+environments with content digests) and the DuckDB query layer
+(`private/db/analytics.duckdb`: views over the canonical files plus
+regenerable Parquet caches). It ends with a parity gate: the SQL-derived
+leaderboard must match the Python renderer exactly, otherwise the step
+fails loudly. Both directories are gitignored and rebuildable at any
+time; the canonical store remains `public/`.
 
 `benchmark` and `all` accept `--manifest <file>` (repeatable) to scope a
 run, `--budget-seconds`, `--timeout-seconds`, and `--out`.

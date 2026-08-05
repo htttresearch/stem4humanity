@@ -30,7 +30,7 @@ DEFAULT_CONFIG_PATH = CONFIG_DIR / "config.toml"
 MODES = ("dev", "prod")
 TRACE_PROFILES = ("full", "decisions", "summary")
 SPLITS = ("train", "test")
-PIPELINE_STEPS = ("generate", "train", "benchmark", "report")
+PIPELINE_STEPS = ("generate", "train", "benchmark", "index", "report")
 
 DEFAULT_PATHS = {
     "instances_dir": "public/data",
@@ -40,6 +40,10 @@ DEFAULT_PATHS = {
     "benchmark_out": "public/results/benchmark.json",
     "leaderboard_out": "public/results/leaderboard.md",
     "model_out": "public/models/candidate_ranker.joblib",
+    "registry_dir": "private/registry",
+    "db_dir": "private/db",
+    "db_path": "private/db/analytics.duckdb",
+    "cache_dir": "private/db/cache",
 }
 
 DEFAULT_PROFILES = {
@@ -68,6 +72,12 @@ class Config:
     benchmark_out: Path
     leaderboard_out: Path
     model_out: Path
+    registry_dir: Path
+    db_dir: Path
+    db_path: Path
+    cache_dir: Path
+    results_glob: str
+    parity: bool
     budget_seconds: float | None
     timeout_seconds: float
     seed: int | None
@@ -157,7 +167,7 @@ def resolve(
     profile_override: str | None = None,
 ) -> Config:
     """Resolve a parsed TOML document into a validated :class:`Config`."""
-    allowed_top = {"profile", "profiles", "paths", "instances", "benchmark", "pipeline", "runtime", "ml"}
+    allowed_top = {"profile", "profiles", "paths", "instances", "benchmark", "pipeline", "runtime", "ml", "store"}
     unknown = set(raw) - allowed_top
     if unknown:
         raise ConfigError(f"config: unknown section(s) {sorted(unknown)}")
@@ -237,6 +247,10 @@ def resolve(
     runtime = _require_table(raw, "runtime")
     verbose = _take(runtime, "verbose", default=True, kind=bool)
 
+    store = _require_table(raw, "store")
+    results_glob = _take(store, "results_glob", default="*.json", kind=str)
+    parity = _take(store, "parity", default=True, kind=bool)
+
     ml = _require_table(raw, "ml")
     n_estimators = _take(ml, "n_estimators", default=250, kind=int)
     if n_estimators <= 0:
@@ -259,6 +273,12 @@ def resolve(
         benchmark_out=paths["benchmark_out"],
         leaderboard_out=paths["leaderboard_out"],
         model_out=paths["model_out"],
+        registry_dir=paths["registry_dir"],
+        db_dir=paths["db_dir"],
+        db_path=paths["db_path"],
+        cache_dir=paths["cache_dir"],
+        results_glob=results_glob,
+        parity=parity,
         budget_seconds=budget_seconds,
         timeout_seconds=timeout_seconds,
         seed=seed,

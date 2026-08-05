@@ -5,8 +5,9 @@ Usage::
     python -m algofinder.harness.runner --config config/config.toml generate   # build manifests
     python -m algofinder.harness.runner --config config/config.toml train      # train the ML solvers
     python -m algofinder.harness.runner --config config/config.toml benchmark  # run all solvers
+    python -m algofinder.harness.runner --config config/config.toml index      # rebuild registry + DuckDB query layer
     python -m algofinder.harness.runner --config config/config.toml report     # render leaderboard
-    python -m algofinder.harness.runner --config config/config.toml all        # generate + train + benchmark + report
+    python -m algofinder.harness.runner --config config/config.toml all        # generate + train + benchmark + index + report
 
 ``--config`` may appear before or after the subcommand.  The config
 file (see ``config/config.toml``) supplies every default; explicit
@@ -160,6 +161,43 @@ def command_report(args: argparse.Namespace, cfg: Config) -> None:
     _log(cfg, f"leaderboard written to {output}")
 
 
+def command_index(args: argparse.Namespace, cfg: Config) -> None:
+    from algofinder.store.indexer import index_all
+
+    summary = index_all(
+        instances_dir=cfg.instances_dir,
+        results_dir=cfg.results_dir,
+        results_glob=args.results_glob,
+        registry_dir=cfg.registry_dir,
+        db_path=args.db_out,
+        cache_dir=cfg.cache_dir,
+        parity=args.parity,
+    )
+    counts = summary["registry"]
+    _log(
+        cfg,
+        f"registry: instances={counts['instances']} solvers={counts['solvers']} "
+        f"runs={counts['runs']} environments={counts['environments']}",
+    )
+    db = summary["db"]
+    _log(
+        cfg,
+        "db: " + " ".join(f"{name}={db[name]}" for name in db if name != "cache_bytes")
+        + f" cache_bytes={db['cache_bytes']}",
+    )
+    if summary["drift"]:
+        for problem in summary["drift"]:
+            print(f"registry drift: {problem}", file=sys.stderr)
+        raise SystemExit(1)
+    if args.parity:
+        parity = summary["parity"]
+        if parity["diffs"]:
+            for diff in parity["diffs"]:
+                print(f"parity mismatch: {diff}", file=sys.stderr)
+            raise SystemExit(1)
+        _log(cfg, f"parity ok: {parity['rows']} leaderboard rows identical")
+
+
 def command_train(args: argparse.Namespace, cfg: Config) -> None:
     from algofinder.ml.train import (
         train_bp_packer,
@@ -233,6 +271,7 @@ def command_all(args: argparse.Namespace, cfg: Config) -> None:
         "generate": lambda: command_generate(args, cfg),
         "train": lambda: command_train(args, cfg),
         "benchmark": lambda: command_benchmark(args, cfg),
+        "index": lambda: command_index(args, cfg),
     }
     for step in cfg.pipeline_steps:
         _log(cfg, f"[pipeline] {step}")
@@ -359,6 +398,32 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
     )
     report.set_defaults(func=lambda args: command_report(args, cfg))
 
+    index = subparsers.add_parser(
+        "index", help="rebuild the registry and DuckDB query layer, "
+        "then verify SQL vs Python leaderboard parity"
+    )
+    _config_flags(index)
+    index.add_argument(
+        "--db-out",
+        type=str,
+        default=str(cfg.db_path),
+        help=f"DuckDB file (config default: {cfg.db_path})",
+    )
+    index.add_argument(
+        "--results-glob",
+        type=str,
+        default=cfg.results_glob,
+        help=f"canonical results glob under the results dir (config default: {cfg.results_glob})",
+    )
+    index.add_argument(
+        "--no-parity",
+        action="store_false",
+        dest="parity",
+        default=cfg.parity,
+        help="skip the SQL-vs-Python leaderboard parity gate",
+    )
+    index.set_defaults(func=lambda args: command_index(args, cfg))
+
     train = subparsers.add_parser(
         "train", help="train and persist the learned solvers"
     )
@@ -436,6 +501,25 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
         default=cfg.memory_bytes,
         help="process-tree RSS cap in bytes (config default: "
         f"{cfg.memory_bytes})",
+    )
+    all_command.add_argument(
+        "--results-glob",
+        type=str,
+        default=cfg.results_glob,
+        help="canonical results glob for the index step",
+    )
+    all_command.add_argument(
+        "--db-out",
+        type=str,
+        default=str(cfg.db_path),
+        help=f"DuckDB file for the index step (config default: {cfg.db_path})",
+    )
+    all_command.add_argument(
+        "--no-parity",
+        action="store_false",
+        dest="parity",
+        default=cfg.parity,
+        help="skip the SQL-vs-Python leaderboard parity gate",
     )
     all_command.add_argument(
         "--out",
