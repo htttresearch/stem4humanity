@@ -5,4 +5,3 @@ __pycache__/
 *ollama.log
 config/scratch/
 private/
-scaffold/
