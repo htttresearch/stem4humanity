@@ -9,6 +9,8 @@ redacted for the agent.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+from pathlib import Path
 from typing import Any
 
 from algofinder.agents.campaign import Campaign, CampaignError
@@ -86,22 +88,109 @@ class EvaluationAuthority:
         timeout_seconds: float,
     ) -> GateOutcome:
         """Run the public smoke gate through an evaluator-owned adapter."""
-        self._check_experiment(experiment, expected_stage="gate_1")
-        if self._zone("gate_1") != "public":
-            raise EvaluationError("gate_1 must be bound to a public suite")
+        return self._gate_bound_local_suite(
+            workspace=workspace,
+            candidate=candidate,
+            experiment=experiment,
+            adapter=adapter,
+            manifest_path=manifest_path,
+            timeout_seconds=timeout_seconds,
+            expected_stage="gate_1",
+            expected_zone="public",
+        )
+
+    def gate_2_validation(
+        self,
+        *,
+        workspace: CandidateWorkspace,
+        candidate: Candidate,
+        experiment: ExperimentSpec,
+        adapter: "PublicBenchmarkAdapter",
+        manifest_path: str,
+        timeout_seconds: float,
+    ) -> GateOutcome:
+        """Evaluate a frozen nomination on a non-agent-visible validation suite."""
+        return self._gate_bound_local_suite(
+            workspace=workspace,
+            candidate=candidate,
+            experiment=experiment,
+            adapter=adapter,
+            manifest_path=manifest_path,
+            timeout_seconds=timeout_seconds,
+            expected_stage="gate_2",
+            expected_zone="validation",
+        )
+
+    def _gate_bound_local_suite(
+        self,
+        *,
+        workspace: CandidateWorkspace,
+        candidate: Candidate,
+        experiment: ExperimentSpec,
+        adapter: "PublicBenchmarkAdapter",
+        manifest_path: str,
+        timeout_seconds: float,
+        expected_stage: str,
+        expected_zone: str,
+    ) -> GateOutcome:
+        self._check_experiment(
+            experiment, expected_stage=expected_stage, reserve_evaluation=False
+        )
+        if self._zone(expected_stage) != expected_zone:
+            raise EvaluationError(
+                f"{expected_stage} must be bound to a {expected_zone} suite"
+            )
         if len(experiment.suite_names) != 1:
-            raise EvaluationError("the local public adapter runs one suite per experiment")
+            raise EvaluationError("the local adapter runs one suite per experiment")
         suite = next(
             (item for item in self.campaign.spec["suites"] if item["name"] == experiment.suite_names[0]),
             None,
         )
         if suite is None:
             raise EvaluationError("experiment references an unknown suite")
+        manifest = Path(manifest_path).resolve()
+        try:
+            actual_manifest_digest = sha256(manifest.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise EvaluationError(f"cannot read evaluator-owned suite manifest: {exc}") from exc
+        if actual_manifest_digest != suite.get("manifest_digest"):
+            raise EvaluationError(
+                "evaluator-owned suite manifest does not match the campaign's frozen digest"
+            )
+        report = self.workspaces.validate(
+            workspace, solver_entrypoints=candidate.solver_entrypoints
+        )
+        if not report.passed or report.build_digest != candidate.build_digest:
+            raise EvaluationError(
+                "candidate build changed or became invalid after gate_0 freezing"
+            )
+        reserved_seconds = adapter.reserved_evaluation_seconds(
+            manifest_path=manifest_path,
+            splits=tuple(suite.get("splits", ("test",))),
+            candidate=candidate,
+            per_cell_budget_seconds=experiment.budget_seconds,
+        )
+        self.campaign.reserve_evaluation(
+            experiment.stage, evaluation_seconds=reserved_seconds
+        )
         raw = adapter.evaluate(
             workspace=workspace, candidate=candidate, experiment=experiment,
             manifest_path=manifest_path, splits=tuple(suite.get("splits", ("test",))),
-            timeout_seconds=timeout_seconds,
+            timeout_seconds=timeout_seconds, zone=expected_zone,  # type: ignore[arg-type]
         )
+        metrics = raw.get("metric_vector", {})
+        if isinstance(metrics, dict):
+            measured: dict[str, float] = {}
+            wall = metrics.get("total_solver_wall_seconds")
+            cpu = metrics.get("total_solver_cpu_seconds")
+            if isinstance(wall, (int, float)) and wall >= 0:
+                measured["evaluation_seconds"] = float(wall)
+            if isinstance(cpu, (int, float)) and cpu >= 0:
+                measured["cpu_seconds"] = float(cpu)
+            if measured:
+                self.campaign.record_usage(
+                    purpose=f"measured-evaluation:{expected_stage}", amounts=measured
+                )
         return self._record(
             experiment, candidate, raw, evaluator_build_digest=candidate.build_digest,
         )
@@ -138,7 +227,13 @@ class EvaluationAuthority:
         self.campaign.ledger.write(evaluation)
         return GateOutcome(evaluation=evaluation, agent_feedback=self.feedback.redact(raw, zone))
 
-    def _check_experiment(self, experiment: ExperimentSpec, expected_stage: str | None = None) -> None:
+    def _check_experiment(
+        self,
+        experiment: ExperimentSpec,
+        expected_stage: str | None = None,
+        *,
+        reserve_evaluation: bool = True,
+    ) -> None:
         try:
             self.campaign.require_active()
         except CampaignError as exc:
@@ -151,8 +246,9 @@ class EvaluationAuthority:
         missing = set(experiment.suite_names) - suite_names
         if missing:
             raise EvaluationError(f"experiment names unknown suites: {sorted(missing)}")
-        seconds = experiment.budget_seconds or 0.0
-        self.campaign.reserve_evaluation(experiment.stage, evaluation_seconds=seconds)
+        if reserve_evaluation:
+            seconds = experiment.budget_seconds or 0.0
+            self.campaign.reserve_evaluation(experiment.stage, evaluation_seconds=seconds)
 
     def _zone(self, stage: str) -> str:
         zones = {suite["zone"] for suite in self.campaign.spec["suites"] if suite["stage"] == stage}
@@ -175,6 +271,7 @@ class EvaluationAuthority:
             generation_operator=mapping["generation_operator"],
             solver_entrypoints=tuple(mapping.get("solver_entrypoints", ())),
             producing_agent_run_id=mapping.get("producing_agent_run_id"),
+            producing_episode_id=mapping.get("producing_episode_id"),
             patch_digest=mapping.get("patch_digest"),
             build_digest=mapping.get("build_digest"),
             descriptors=dict(mapping.get("descriptors", {})),

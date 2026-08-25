@@ -8,6 +8,7 @@ recover a campaign after an interrupted process.
 
 from __future__ import annotations
 
+from hashlib import sha256
 import json
 import os
 from pathlib import Path
@@ -44,12 +45,16 @@ class HasMapping(Protocol):
 
 
 _DIRECTORIES = {
+    "agent_spec": "agents",
     "hypothesis": "hypotheses",
     "candidate": "candidates",
     "experiment": "experiments",
     "evaluation": "evaluations",
     "analysis": "analyses",
     "agent_run": "episodes",
+    "agent_episode": "episodes",
+    "research_attempt": "attempts",
+    "agent_transition": "transitions",
 }
 
 
@@ -82,8 +87,12 @@ class CampaignLedger:
                 f"expected={sorted(expected)}, got={sorted(supplied)}"
             )
         ledger.root.mkdir(parents=True, exist_ok=False)
-        for directory in ("agents", "hypotheses", "candidates", "experiments", "analyses", "evaluations", "episodes", "workspaces"):
-            (ledger.root / directory).mkdir()
+        for directory in (
+            "agents", "hypotheses", "candidates", "experiments", "analyses",
+            "evaluations", "episodes", "attempts", "transitions", "blobs/sha256",
+            "workspaces",
+        ):
+            (ledger.root / directory).mkdir(parents=True)
         ledger._write_immutable_path(ledger.root / "campaign.json", spec.to_mapping())
         for agent in supplied.values():
             ledger._write_immutable_path(
@@ -116,7 +125,9 @@ class CampaignLedger:
         path = self._record_path(kind, record_id)
         digest = self._write_immutable_path(path, mapping)
         if kind == "agent_run":
-            (path.parent / record_id / "events.jsonl").touch(exist_ok=True)
+            events_path = path.parent / record_id / "events.jsonl"
+            events_path.parent.mkdir(exist_ok=True)
+            events_path.touch(exist_ok=True)
         return digest
 
     def decide(self, decision: Decision) -> str:
@@ -130,12 +141,46 @@ class CampaignLedger:
         self.append("decisions.jsonl", {**mapping, "content_digest": digest})
         return digest
 
-    def append_episode_event(self, agent_run_id: str, event: dict[str, Any]) -> None:
-        """Append a JSON-safe tool or lifecycle event to an existing episode."""
-        episode = self._record_path("agent_run", agent_run_id)
+    def append_episode_event(self, episode_id: str, event: dict[str, Any]) -> None:
+        """Append a JSON-safe checkpoint to an existing run or learning episode."""
+        episode = self.root / "episodes" / f"{episode_id}.json"
         if not episode.is_file():
-            raise LedgerError(f"agent run does not exist: {agent_run_id}")
-        self.append(f"episodes/{agent_run_id}/events.jsonl", event)
+            raise LedgerError(f"episode does not exist: {episode_id}")
+        self.append(f"episodes/{episode_id}/events.jsonl", event)
+
+    def put_blob(self, value: str | bytes) -> str:
+        """Store one immutable private blob and return its content-addressed id."""
+        data = value.encode("utf-8") if isinstance(value, str) else bytes(value)
+        digest = sha256(data).hexdigest()
+        path = self.root / "blobs" / "sha256" / digest
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            if path.read_bytes() != data:
+                raise LedgerError(f"blob digest collision: {digest}")
+            return f"sha256:{digest}"
+        try:
+            os.write(fd, data)
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        return f"sha256:{digest}"
+
+    def read_blob(self, digest: str) -> bytes:
+        """Read a private blob after verifying its self-addressed digest."""
+        if not digest.startswith("sha256:"):
+            raise LedgerError("blob digest must use sha256:<hex>")
+        value = digest.removeprefix("sha256:")
+        if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+            raise LedgerError("invalid blob digest")
+        try:
+            data = (self.root / "blobs" / "sha256" / value).read_bytes()
+        except FileNotFoundError as exc:
+            raise LedgerError(f"missing blob: {digest}") from exc
+        if sha256(data).hexdigest() != value:
+            raise LedgerError(f"blob digest mismatch: {digest}")
+        return data
 
     def append(self, relative_path: str, record: dict[str, Any]) -> None:
         """Atomically append one strict-JSON record with a process lock."""
@@ -188,7 +233,9 @@ class CampaignLedger:
             return []
         records: list[dict[str, Any]] = []
         for path in sorted(directory.glob("*.json")):
-            records.append(self.read_path(path))
+            record = self.read_path(path)
+            if record.get("kind") == kind:
+                records.append(record)
         return records
 
     def query(self, kind: str, **filters: Any) -> list[dict[str, Any]]:

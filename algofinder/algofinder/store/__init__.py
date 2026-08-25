@@ -32,6 +32,13 @@ from algofinder.store.queries import (
     parity_compare,
     parity_check,
 )
+from algofinder.store.warehouse import (
+    discovery_report,
+    ingest as ingest_warehouse,
+    overview as warehouse_overview,
+    reproject as reproject_warehouse,
+    verify as verify_warehouse,
+)
 
 __all__ = [
     "PROJECT_ROOT",
@@ -49,4 +56,9 @@ __all__ = [
     "run_digest",
     "sha256_file",
     "write_kind",
+    "discovery_report",
+    "ingest_warehouse",
+    "warehouse_overview",
+    "reproject_warehouse",
+    "verify_warehouse",
 ]

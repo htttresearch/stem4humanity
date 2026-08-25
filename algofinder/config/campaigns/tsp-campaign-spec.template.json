@@ -1,8 +1,8 @@
 {
   "id": "tsp-agent-v1",
-  "base_commit": "REPLACE_WITH_COMMITTED_INFRASTRUCTURE_SHA",
+  "base_commit": "753d48d93fbbd773f75cefb602b4a046dc715585",
   "allowed_paths": [
-    "algofinder/solvers/**"
+    "algofinder/algofinder/solvers/**"
   ],
   "suites": [
     {
@@ -10,7 +10,7 @@
       "stage": "gate_0",
       "zone": "public",
       "manifest_digest": "cf57c464f64a03de9f94f12eb51ecd762a7919722e22a3cd2b05c4cf9a92e57f",
-      "manifest_path": "algofinder/data/instances/tsp_manifests.json",
+      "manifest_path": "algofinder/public/data/tsp_manifests.json",
       "splits": ["train"],
       "repetitions": 1
     },
@@ -19,7 +19,7 @@
       "stage": "gate_1",
       "zone": "public",
       "manifest_digest": "cf57c464f64a03de9f94f12eb51ecd762a7919722e22a3cd2b05c4cf9a92e57f",
-      "manifest_path": "algofinder/data/instances/tsp_manifests.json",
+      "manifest_path": "algofinder/public/data/tsp_manifests.json",
       "splits": ["train"],
       "repetitions": 1
     },
@@ -28,7 +28,6 @@
       "stage": "gate_4",
       "zone": "validation",
       "manifest_digest": "a4fce7bf731351cfdbfba3d59bdf0f02d177303e4869b4fd08bac5482086eed9",
-      "manifest_path": "REPLACE_WITH_EVALUATOR_ONLY_VALIDATION_MANIFEST",
       "splits": ["validation"],
       "repetitions": 3
     },
@@ -37,7 +36,6 @@
       "stage": "gate_5",
       "zone": "validation",
       "manifest_digest": "a4fce7bf731351cfdbfba3d59bdf0f02d177303e4869b4fd08bac5482086eed9",
-      "manifest_path": "REPLACE_WITH_EVALUATOR_ONLY_OOD_MANIFEST",
       "splits": ["test_iid", "test_family_ood", "test_parameter_ood"],
       "repetitions": 3
     },
@@ -45,7 +43,7 @@
       "name": "tsp-sealed-challenge",
       "stage": "gate_6",
       "zone": "challenge",
-      "manifest_digest": "REPLACE_WITH_SEALED_MANIFEST_SHA256",
+      "manifest_digest": "a4fce7bf731351cfdbfba3d59bdf0f02d177303e4869b4fd08bac5482086eed9",
       "splits": ["test_iid", "test_family_ood", "test_parameter_ood"],
       "repetitions": 3
     }
@@ -61,15 +59,21 @@
   "agent_spec_ids": [
     "agent-research-v1"
   ],
-  "search_policy_version": "REPLACE_WITH_FIXED_RESEARCH_POLICY_VERSION",
+  "search_policy_version": "qd-map-elites-ucb@3",
   "objective": {
     "primary": "paired_gap_percent",
+    "direction": "minimize",
     "hard_gates": ["feasibility", "independent_objective", "patch_policy"],
-    "secondary": ["reliability", "wall_seconds", "peak_rss_bytes"]
+    "secondary": ["reliability", "wall_seconds", "peak_rss_bytes"],
+    "archive_axes": ["algorithm_family", "runtime_class", "generation_operator"],
+    "iterative_feedback_zones": ["public", "validation"]
   },
   "goal": "Improve Euclidean TSP solver quality without regressing correctness or resource reliability.",
   "problem_scope": ["tsp:euclidean", "tsp:clustered"],
   "feedback_rounding": 4,
   "network_policy": "deny",
-  "human_approval_stages": ["gate_6"]
+  "human_approval_stages": ["gate_6"],
+  "distribution_profile_id": null,
+  "distribution_profile_digest": null,
+  "evidence_partition_id": null
 }

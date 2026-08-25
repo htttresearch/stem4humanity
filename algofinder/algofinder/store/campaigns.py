@@ -24,6 +24,8 @@ _SOURCES = {
     "analyses": ("analyses/*.json",),
     "decisions": ("decisions/*.json",),
     "episodes": ("episodes/*.json",),
+    "attempts": ("attempts/*.json",),
+    "transitions": ("transitions/*.json",),
 }
 
 
@@ -78,7 +80,11 @@ def _summary(record: dict[str, Any], path: Path) -> dict[str, Any]:
         "schema_id": record.get("schema_id"),
         "schema_version": record.get("schema_version"),
     }
-    for key in ("stage", "zone", "gate", "candidate_id", "experiment_id", "agent_spec_id", "created_at"):
+    for key in (
+        "stage", "zone", "gate", "candidate_id", "experiment_id", "agent_spec_id",
+        "episode_id", "attempt_id", "producing_episode_id", "producing_agent_run_id",
+        "policy_id", "created_at",
+    ):
         if key in record:
             result[key] = record[key]
     return result

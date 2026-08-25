@@ -52,6 +52,7 @@ _TRANSITIONS: dict[CampaignLifecycle, frozenset[CampaignLifecycle]] = {
 class BudgetStatus:
     limits: BudgetLimits
     used: dict[str, float | int]
+    actual: dict[str, float | int]
 
     def remaining(self, key: str) -> float | int | None:
         limit_map: dict[str, float | int | None] = {
@@ -69,6 +70,8 @@ class BudgetStatus:
         return {
             "limits": self.limits.to_mapping(),
             "used": dict(self.used),
+            "reserved": dict(self.used),
+            "actual": dict(self.actual),
             "remaining": {
                 key: self.remaining(key)
                 for key in (
@@ -162,6 +165,7 @@ class Campaign:
             "validation_submissions": 0,
             "challenge_submissions": 0,
         }
+        actual: dict[str, float | int] = dict(used)
         path = self.root / "budget.jsonl"
         if path.exists():
             with open(path, encoding="utf-8") as handle:
@@ -172,12 +176,13 @@ class Campaign:
                         event = json.loads(raw)
                     except json.JSONDecodeError as exc:
                         raise CampaignError(f"invalid budget event at line {line_no}") from exc
+                    target = actual if event.get("event") == "usage" else used
                     for key, amount in event.get("amounts", {}).items():
-                        if key not in used or not isinstance(amount, (int, float)):
+                        if key not in target or not isinstance(amount, (int, float)):
                             raise CampaignError(f"invalid budget amount {key!r} at line {line_no}")
-                        used[key] += amount
+                        target[key] += amount
         limits = self._limits()
-        return BudgetStatus(limits=limits, used=used)
+        return BudgetStatus(limits=limits, used=used, actual=actual)
 
     def reserve_budget(self, *, purpose: str, amounts: dict[str, float | int]) -> BudgetStatus:
         """Atomically account for a cost before starting work.
@@ -234,6 +239,23 @@ class Campaign:
         elif zone == "challenge":
             amounts["challenge_submissions"] = 1
         return self.reserve_budget(purpose=f"evaluation:{stage}", amounts=amounts)
+
+    def record_usage(self, *, purpose: str, amounts: dict[str, float | int]) -> BudgetStatus:
+        """Append measured consumption separately from conservative reservations."""
+        if not purpose.strip():
+            raise CampaignError("usage accounting needs a purpose")
+        allowed = {"tokens", "wall_seconds", "cpu_seconds", "evaluation_seconds"}
+        if not amounts or set(amounts) - allowed:
+            raise CampaignError(f"invalid usage dimensions {sorted(set(amounts) - allowed)}")
+        if any(not isinstance(value, (int, float)) or value < 0 for value in amounts.values()):
+            raise CampaignError("usage amounts must be non-negative numbers")
+        self.ledger.append("budget.jsonl", {
+            "event": "usage",
+            "purpose": purpose,
+            "amounts": amounts,
+            "created_at": utc_now(),
+        })
+        return self.budget_status()
 
     def snapshot(self, *, agent_visible: bool = False) -> dict[str, Any]:
         """Stable observation for an agent episode; challenge paths are omitted."""

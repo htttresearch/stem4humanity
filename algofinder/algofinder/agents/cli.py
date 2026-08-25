@@ -35,6 +35,9 @@ def _campaign_spec(value: dict[str, Any]) -> CampaignSpec:
         feedback_rounding=value.get("feedback_rounding", 4),
         network_policy=value.get("network_policy", "deny"),
         human_approval_stages=tuple(value.get("human_approval_stages", ("gate_6",))),
+        distribution_profile_id=value.get("distribution_profile_id"),
+        distribution_profile_digest=value.get("distribution_profile_digest"),
+        evidence_partition_id=value.get("evidence_partition_id"),
         created_at=value.get("created_at") or utc_now(),
     )
 
@@ -46,6 +49,7 @@ def _agent_spec(value: dict[str, Any]) -> AgentSpec:
         tool_api_version=value["tool_api_version"], context_policy=value["context_policy"],
         sampling=dict(value.get("sampling", {})), permissions=tuple(value.get("permissions", ())),
         secret_references=tuple(value.get("secret_references", ())),
+        policy_id=value.get("policy_id"), policy_digest=value.get("policy_digest"),
         created_at=value.get("created_at") or utc_now(),
     )
 

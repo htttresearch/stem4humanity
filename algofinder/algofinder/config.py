@@ -275,10 +275,10 @@ def resolve(
     features = _require_table(raw, "features")
     feature_sets = _take_str_list(features, "enabled")
     for feature_set in feature_sets:
-        if feature_set not in ("params@1", "etsp-geometry@1"):
+        if feature_set not in ("params@1", "etsp-geometry@1", "etsp-geometry@2"):
             raise ConfigError(
                 f"config: 'features.enabled' entries must be one of "
-                f"params@1, etsp-geometry@1, got {feature_set!r}"
+                f"params@1, etsp-geometry@1, etsp-geometry@2, got {feature_set!r}"
             )
 
     ml = _require_table(raw, "ml")

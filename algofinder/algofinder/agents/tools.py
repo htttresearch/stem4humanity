@@ -20,7 +20,7 @@ from algofinder.agents.contracts import (
     new_id,
 )
 from algofinder.agents.ledger import LedgerError
-from algofinder.agents.workspace import CandidateWorkspace, WorkspaceService
+from algofinder.agents.workspace import CandidateWorkspace, WorkspaceError, WorkspaceService
 
 
 class ToolError(RuntimeError):
@@ -30,7 +30,7 @@ class ToolError(RuntimeError):
 class AgentTools:
     """Versioned facade over a fixed campaign's permitted operations."""
 
-    api_version = "algofinder-agent-tools@1"
+    api_version = "algofinder-agent-tools@3"
 
     def __init__(self, campaign: Campaign, workspaces: WorkspaceService) -> None:
         self.campaign = campaign
@@ -89,9 +89,14 @@ class AgentTools:
 
     def archive_query(self, kind: str, **filters: Any) -> list[dict[str, Any]]:
         try:
-            return self.campaign.ledger.query(kind, **filters)
+            records = self.campaign.ledger.query(kind, **filters)
         except LedgerError as exc:
             raise ToolError(str(exc)) from exc
+        if kind != "evaluation":
+            return records
+        # Evaluation.feedback contains authority-private raw runs. Generic
+        # archive access must expose the same summary boundary as runs_compare.
+        return [self._evaluation_summary(item) for item in records]
 
     def archive_lineage(self, candidate_id: str) -> list[dict[str, Any]]:
         """Return immutable candidate ancestors in parent-before-child order."""
@@ -119,6 +124,42 @@ class AgentTools:
     def campaign_snapshot(self) -> dict[str, Any]:
         return self.campaign.snapshot(agent_visible=True)
 
+    def source_read(
+        self,
+        paths: Iterable[str],
+        *,
+        max_total_bytes: int = 80_000,
+    ) -> list[dict[str, str]]:
+        """Read bounded solver sources from the campaign's fixed base commit."""
+        try:
+            return self.workspaces.read_base_sources(paths, max_total_bytes=max_total_bytes)
+        except Exception as exc:
+            raise ToolError(str(exc)) from exc
+
+    def candidate_patch_read(self, candidate_id: str, *, max_bytes: int = 80_000) -> str:
+        """Read one frozen candidate patch for lineage-aware mutation."""
+        if max_bytes < 1:
+            raise ToolError("max_bytes must be positive")
+        try:
+            self.campaign.ledger.read("candidate", candidate_id)
+        except LedgerError as exc:
+            raise ToolError(str(exc)) from exc
+        path = self.campaign.root / "candidates" / candidate_id / "change.patch"
+        try:
+            patch = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise ToolError(f"candidate patch is unavailable: {candidate_id}") from exc
+        if len(patch.encode("utf-8")) > max_bytes:
+            raise ToolError(f"candidate patch exceeds {max_bytes} bytes")
+        return patch
+
+    def candidate_template_describe(self, workspace: CandidateWorkspace) -> dict[str, Any]:
+        """Return authority-derived state and behavior descriptors for a template."""
+        try:
+            return self.workspaces.describe_template(workspace)
+        except WorkspaceError as exc:
+            raise ToolError(str(exc)) from exc
+
     def runs_compare(self, candidate_ids: Iterable[str]) -> dict[str, Any]:
         """Compare recorded evaluation summaries; raw benchmark data stays private."""
         wanted = set(candidate_ids)
@@ -126,17 +167,33 @@ class AgentTools:
             raise ToolError("runs_compare requires at least one candidate")
         evaluations = self.campaign.ledger.list("evaluation")
         rows = [
-            {
-                "candidate_id": item["candidate_id"],
-                "stage": item["stage"],
-                "zone": item["zone"],
-                "gate": item["gate"],
-                "metric_vector": item.get("metric_vector", {}),
-                "paired_baselines": item.get("paired_baselines", {}),
-            }
+            self._evaluation_summary(item)
             for item in evaluations if item.get("candidate_id") in wanted
         ]
         return {"candidates": sorted(wanted), "evaluations": rows}
+
+    def _evaluation_summary(self, item: dict[str, Any]) -> dict[str, Any]:
+        zone = item["zone"]
+        metric_vector = item.get("metric_vector", {})
+        paired_baselines = item.get("paired_baselines", {})
+        if zone == "challenge":
+            metric_vector = {
+                key: value
+                for key, value in metric_vector.items()
+                if isinstance(value, (int, float, bool)) or value is None
+            } if isinstance(metric_vector, dict) else {}
+            paired_baselines = {}
+        return {
+            "id": item.get("id"),
+            "candidate_id": item["candidate_id"],
+            "stage": item["stage"],
+            "zone": item["zone"],
+            "gate": item["gate"],
+            "metric_vector": metric_vector,
+            "paired_baselines": paired_baselines,
+            "evaluator_build_digest": item.get("evaluator_build_digest"),
+            "created_at": item.get("created_at"),
+        }
 
     # Write tools --------------------------------------------------------
     def hypothesis_create(
@@ -169,6 +226,7 @@ class AgentTools:
         hypothesis_id: str,
         parent_ids: Iterable[str] = (),
         generation_operator: str = "invent",
+        template_id: str | None = None,
     ) -> CandidateWorkspace:
         self._require_active()
         parents = tuple(parent_ids)
@@ -182,15 +240,38 @@ class AgentTools:
             hypothesis_id=hypothesis_id,
             parent_ids=parents,
             generation_operator=generation_operator,
+            template_id=template_id,
         )
 
     def candidate_apply_patch(self, workspace: CandidateWorkspace, patch: str) -> None:
         self._require_active()
         self.workspaces.apply_patch(workspace, patch)
 
-    def candidate_validate(self, workspace: CandidateWorkspace) -> dict[str, Any]:
+    def candidate_apply_template_values(
+        self,
+        workspace: CandidateWorkspace,
+        *,
+        values: dict[str, str],
+    ) -> None:
+        """Fill only the constrained, model-owned gaps in a trusted scaffold."""
         self._require_active()
-        return self.workspaces.validate(workspace).to_mapping()
+        self.workspaces.apply_template_values(workspace, values=values)
+
+    def candidate_validate(
+        self,
+        workspace: CandidateWorkspace,
+        *,
+        solver_entrypoints: Iterable[str] = (),
+    ) -> dict[str, Any]:
+        self._require_active()
+        return self.workspaces.validate(
+            workspace,
+            solver_entrypoints=tuple(solver_entrypoints),
+        ).to_mapping()
+
+    def _candidate_discard_rejected(self, workspace: CandidateWorkspace) -> None:
+        """Control-plane cleanup for an unfrozen rejected proposal."""
+        self.workspaces.discard(workspace)
 
     def candidate_freeze(
         self,
@@ -199,6 +280,7 @@ class AgentTools:
         solver_entrypoints: Iterable[str] = (),
         descriptors: dict[str, Any] | None = None,
         producing_agent_run_id: str | None = None,
+        producing_episode_id: str | None = None,
     ) -> Candidate:
         self._require_active()
         return self.workspaces.freeze(
@@ -206,6 +288,7 @@ class AgentTools:
             solver_entrypoints=tuple(solver_entrypoints),
             descriptors=descriptors,
             producing_agent_run_id=producing_agent_run_id,
+            producing_episode_id=producing_episode_id,
         )
 
     def experiment_propose(

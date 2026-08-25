@@ -114,7 +114,9 @@ class SandboxRunner:
             )
         except subprocess.TimeoutExpired as exc:
             return SandboxResult(124, exc.stdout or "", exc.stderr or "", timed_out=True)
-        return SandboxResult(result.returncode, result.stdout[-8000:], result.stderr[-8000:])
+        # Evaluator workers return one structured JSON document. Truncating its
+        # prefix makes otherwise successful evidence impossible to parse.
+        return SandboxResult(result.returncode, result.stdout, result.stderr[-8000:])
 
     def _run_bwrap(
         self,
@@ -151,7 +153,7 @@ class SandboxRunner:
             result = subprocess.run(args, text=True, capture_output=True, timeout=policy.timeout_seconds, check=False)
         except subprocess.TimeoutExpired as exc:
             return SandboxResult(124, exc.stdout or "", exc.stderr or "", timed_out=True)
-        return SandboxResult(result.returncode, result.stdout[-8000:], result.stderr[-8000:])
+        return SandboxResult(result.returncode, result.stdout, result.stderr[-8000:])
 
 
 __all__ = ["SandboxError", "SandboxPolicy", "SandboxResult", "SandboxRunner"]

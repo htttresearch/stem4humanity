@@ -154,6 +154,8 @@ class AgentSpec:
     sampling: dict[str, Any] = field(default_factory=dict)
     permissions: tuple[str, ...] = ()
     secret_references: tuple[str, ...] = ()
+    policy_id: str | None = None
+    policy_digest: str | None = None
     created_at: str = field(default_factory=utc_now)
 
     def __post_init__(self) -> None:
@@ -166,6 +168,12 @@ class AgentSpec:
         _strings(self.secret_references, "secret_references")
         if any("=" in ref or ref.lower().startswith(("sk-", "ghp_")) for ref in self.secret_references):
             raise ContractError("secret_references must be names/locators, never secret values")
+        if self.policy_id is not None:
+            _require_id(self.policy_id, "policy_id")
+        if self.policy_digest is not None and not re.fullmatch(r"[0-9a-f]{64}", self.policy_digest):
+            raise ContractError("policy_digest must be a sha256 hex digest")
+        if (self.policy_id is None) != (self.policy_digest is None):
+            raise ContractError("policy_id and policy_digest must be set together")
         to_json_value(self.sampling)
 
     def to_mapping(self) -> dict[str, Any]:
@@ -182,6 +190,8 @@ class AgentSpec:
             "sampling": to_json_value(self.sampling),
             "permissions": list(self.permissions),
             "secret_references": list(self.secret_references),
+            "policy_id": self.policy_id,
+            "policy_digest": self.policy_digest,
             "created_at": self.created_at,
         }
 
@@ -207,6 +217,9 @@ class CampaignSpec:
     feedback_rounding: int = 4
     network_policy: Literal["deny", "allowlist"] = "deny"
     human_approval_stages: tuple[EvaluationStage, ...] = ("gate_6",)
+    distribution_profile_id: str | None = None
+    distribution_profile_digest: str | None = None
+    evidence_partition_id: str | None = None
     created_at: str = field(default_factory=utc_now)
 
     def __post_init__(self) -> None:
@@ -231,6 +244,14 @@ class CampaignSpec:
             raise ContractError("suite names must be unique")
         if any(stage not in _STAGES for stage in self.human_approval_stages):
             raise ContractError("unknown human approval stage")
+        if self.distribution_profile_id is not None:
+            _require_id(self.distribution_profile_id, "distribution_profile_id")
+        if self.distribution_profile_digest is not None and not re.fullmatch(r"[0-9a-f]{64}", self.distribution_profile_digest):
+            raise ContractError("distribution_profile_digest must be a sha256 hex digest")
+        if (self.distribution_profile_id is None) != (self.distribution_profile_digest is None):
+            raise ContractError("distribution profile id and digest must be set together")
+        if self.evidence_partition_id is not None:
+            _require_id(self.evidence_partition_id, "evidence_partition_id")
         to_json_value(self.objective)
 
     def to_mapping(self, *, agent_visible: bool = False) -> dict[str, Any]:
@@ -255,6 +276,9 @@ class CampaignSpec:
             "feedback_rounding": self.feedback_rounding,
             "network_policy": self.network_policy,
             "human_approval_stages": list(self.human_approval_stages),
+            "distribution_profile_id": self.distribution_profile_id,
+            "distribution_profile_digest": self.distribution_profile_digest,
+            "evidence_partition_id": self.evidence_partition_id,
             "created_at": self.created_at,
         }
 
@@ -310,6 +334,7 @@ class Candidate:
     generation_operator: Literal["invent", "mutate", "recombine", "repair", "tune", "distill"]
     solver_entrypoints: tuple[str, ...] = ()
     producing_agent_run_id: str | None = None
+    producing_episode_id: str | None = None
     patch_digest: str | None = None
     build_digest: str | None = None
     descriptors: dict[str, Any] = field(default_factory=dict)
@@ -325,6 +350,10 @@ class Candidate:
             raise ContractError("solver_entrypoints must use module:Class syntax")
         if self.generation_operator not in {"invent", "mutate", "recombine", "repair", "tune", "distill"}:
             raise ContractError(f"unsupported generation operator {self.generation_operator!r}")
+        if self.producing_agent_run_id is not None:
+            _require_id(self.producing_agent_run_id, "producing_agent_run_id")
+        if self.producing_episode_id is not None:
+            _require_id(self.producing_episode_id, "producing_episode_id")
         for digest in (self.patch_digest, self.build_digest):
             if digest is not None and not re.fullmatch(r"[0-9a-f]{64}", digest):
                 raise ContractError("candidate digests must be sha256 hex digests")
@@ -337,6 +366,7 @@ class Candidate:
             "generation_operator": self.generation_operator,
             "solver_entrypoints": list(self.solver_entrypoints),
             "producing_agent_run_id": self.producing_agent_run_id,
+            "producing_episode_id": self.producing_episode_id,
             "patch_digest": self.patch_digest,
             "build_digest": self.build_digest,
             "descriptors": to_json_value(self.descriptors),
@@ -538,6 +568,11 @@ class AgentRun:
     monetary_cost: float | None = None
     terminal_outcome: Literal["completed", "failed", "cancelled"] = "completed"
     error: str | None = None
+    episode_id: str | None = None
+    policy_id: str | None = None
+    attempt_ids: tuple[str, ...] = ()
+    cost_vector: dict[str, float | int] = field(default_factory=dict)
+    completion_reason: str | None = None
     created_at: str = field(default_factory=utc_now)
 
     def __post_init__(self) -> None:
@@ -550,11 +585,18 @@ class AgentRun:
         if self.terminal_outcome not in ("completed", "failed", "cancelled"):
             raise ContractError("agent terminal_outcome is invalid")
         _strings(self.produced_candidate_ids, "produced_candidate_ids")
+        _strings(self.attempt_ids, "attempt_ids")
+        if self.episode_id is not None:
+            _require_id(self.episode_id, "episode_id")
+        if self.policy_id is not None:
+            _require_id(self.policy_id, "policy_id")
+        if any(not isinstance(value, (int, float)) or value < 0 for value in self.cost_vector.values()):
+            raise ContractError("agent cost_vector values must be non-negative numbers")
         to_json_value(self.inputs)
         to_json_value(self.tool_calls)
 
     def to_mapping(self) -> dict[str, Any]:
-        return _record_mapping("agent_run", self.agent_run_id, self.campaign_id, {
+        mapping = _record_mapping("agent_run", self.agent_run_id, self.campaign_id, {
             "agent_spec_id": self.agent_spec_id,
             "campaign_snapshot_digest": self.campaign_snapshot_digest,
             "inputs": to_json_value(self.inputs),
@@ -564,8 +606,15 @@ class AgentRun:
             "monetary_cost": self.monetary_cost,
             "terminal_outcome": self.terminal_outcome,
             "error": self.error,
+            "episode_id": self.episode_id,
+            "policy_id": self.policy_id,
+            "attempt_ids": list(self.attempt_ids),
+            "cost_vector": to_json_value(self.cost_vector),
+            "completion_reason": self.completion_reason,
             "created_at": self.created_at,
         })
+        mapping["schema_version"] = "2"
+        return mapping
 
     @property
     def digest(self) -> str:
@@ -585,7 +634,8 @@ def _record_mapping(kind: str, record_id: str, campaign_id: str, fields: dict[st
 
 RECORD_KINDS = frozenset({
     "agent_spec", "campaign", "hypothesis", "candidate", "experiment",
-    "evaluation", "analysis", "decision", "agent_run",
+    "evaluation", "analysis", "decision", "agent_run", "agent_episode",
+    "research_attempt", "agent_transition",
 })
 
 
