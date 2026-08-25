@@ -28,7 +28,7 @@ from algofinder.store.canonical import (
     sha256_file,
 )
 from algofinder.store.queries import _list_literal, parity_check
-from algofinder.store.registry import KINDS, Registry, write_kind
+from algofinder.store.registry import CAMPAIGN_KINDS, CORE_KINDS, Registry, write_kind
 
 
 def _load_instances(instances_dir: str | Path) -> list[dict[str, Any]]:
@@ -61,6 +61,7 @@ def _solver_entries() -> list[dict[str, Any]]:
 
     entries: list[dict[str, Any]] = []
     for solver_id, cls in sorted(all_solvers().items()):
+        instance = None
         try:
             instance = cls()
             capabilities = instance.capabilities().to_mapping()
@@ -74,6 +75,7 @@ def _solver_entries() -> list[dict[str, Any]]:
                 "applies_to": sorted(cls.applies_to),
                 "module": cls.__module__,
                 "capabilities": capabilities,
+                "manifest": instance.manifest().to_mapping() if instance is not None else None,
                 "schema_version": SCHEMA_VERSION,
             }
         )
@@ -193,7 +195,7 @@ def build_registry(
 ) -> dict[str, int]:
     """Regenerate every registry log from the canonical files."""
     counts: dict[str, int] = {}
-    for kind in KINDS:
+    for kind in CORE_KINDS:
         write_kind(registry_dir, kind, [])
         counts[kind] = 0
     for kind, entries in (
@@ -307,14 +309,17 @@ def build_db(
                 "CREATE OR REPLACE VIEW v_features_cache AS "
                 "SELECT * FROM read_parquet(" + _list_literal([str(_cache(cache_dir, "features"))]) + ")"
             )
-        for kind in ("solvers", "environments"):
+        for kind in ("solvers", "environments", *CAMPAIGN_KINDS):
             _create_registry_view(con, registry, kind)
     finally:
         con.close()
 
     counts: dict[str, int] = {}
     with duckdb.connect(str(db_path)) as con:
-        for name in ("v_runs", "v_instances", "v_references", "v_solvers", "v_environments", "v_features"):
+        for name in (
+            "v_runs", "v_instances", "v_references", "v_solvers", "v_environments",
+            "v_features", *(f"v_{kind}" for kind in CAMPAIGN_KINDS),
+        ):
             try:
                 counts[name] = con.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
             except Exception:

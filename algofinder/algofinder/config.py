@@ -29,7 +29,19 @@ DEFAULT_CONFIG_PATH = CONFIG_DIR / "config.toml"
 
 MODES = ("dev", "prod")
 TRACE_PROFILES = ("full", "decisions", "summary")
-SPLITS = ("train", "test")
+# ``test`` remains supported for legacy manifests.  Compiled suites use the
+# explicit validation/IID/OOD roles below; agent campaigns bind those roles to
+# public, metered, or sealed evaluator zones in CampaignSpec rather than
+# collapsing them back into a single visible test set.
+SPLITS = (
+    "train",
+    "validation",
+    "test",
+    "test_iid",
+    "test_family_ood",
+    "test_parameter_ood",
+    "test_metric_ood",
+)
 PIPELINE_STEPS = ("generate", "train", "benchmark", "features", "index", "report")
 
 DEFAULT_PATHS = {

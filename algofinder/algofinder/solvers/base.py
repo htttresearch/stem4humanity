@@ -79,6 +79,8 @@ class Solver(ABC):
     display: ClassVar[str] = ""
     tags: ClassVar[frozenset[str]] = frozenset()  # exact | heuristic | ml | control
     applies_to: ClassVar[frozenset[str]] = frozenset()  # "tsp:euclidean", ...
+    parameter_space: ClassVar[dict[str, Any]] = {}
+    dependencies: ClassVar[frozenset[str]] = frozenset()
 
     @abstractmethod
     def solve(
@@ -128,6 +130,26 @@ class Solver(ABC):
             "config": self.config(),
             "capabilities": self.capabilities().to_mapping(),
         }
+
+    def manifest(self) -> "SolverManifest":
+        """Versioned plugin metadata for candidate/campaign infrastructure.
+
+        Existing solvers need no changes: the default manifest derives its
+        identity and actual constructor configuration from the established
+        solver contract. New candidate solvers may override ``parameter_space``
+        and ``dependencies`` declaratively.
+        """
+        from algofinder.solvers.manifest import SolverManifest
+
+        return SolverManifest(
+            solver_id=self.id,
+            entrypoint=f"{type(self).__module__}:{type(self).__name__}",
+            applies_to=tuple(sorted(self.applies_to)),
+            tags=tuple(sorted(self.tags)),
+            constructor_config=self.config(),
+            parameter_space=dict(self.parameter_space),
+            dependencies=tuple(sorted(self.dependencies)),
+        )
 
     def capabilities(self) -> SolverCapabilities:
         """Declared adapter capabilities (spec section 8).

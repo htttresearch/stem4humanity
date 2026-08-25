@@ -1,0 +1,15 @@
+{
+  "id": "agent-research-v1",
+  "provider": "REPLACE_PROVIDER",
+  "model": "REPLACE_MODEL",
+  "prompt_digest": "REPLACE_WITH_64_HEX_SHA256",
+  "tool_api_version": "algofinder-agent-tools@1",
+  "context_policy": "REPLACE_CONTEXT_POLICY",
+  "sampling": {
+    "REPLACE": "sampling settings fixed before campaign activation"
+  },
+  "permissions": [
+    "algofinder-agent-tools@1"
+  ],
+  "secret_references": []
+}
