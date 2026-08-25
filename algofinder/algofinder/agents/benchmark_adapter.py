@@ -52,19 +52,28 @@ class PublicBenchmarkAdapter:
         manifest = Path(manifest_path).resolve()
         if not manifest.is_file():
             raise BenchmarkAdapterError(f"public suite manifest not found: {manifest}")
-        if self.runner.isolated_available:
-            raise BenchmarkAdapterError(
-                "Bubblewrap adapter wiring is deployment-specific; use the sealed evaluator service instead"
-            )
         worker = self.authority_package_root / "algofinder" / "agents" / "evaluator_worker.py"
         if not worker.is_file():
             raise BenchmarkAdapterError(f"evaluator worker is missing: {worker}")
         package_root = workspace.worktree / "algofinder"
-        command = [
-            sys.executable, str(worker), "--package-root", str(package_root),
-            "--manifest", str(manifest),
-            "--timeout-seconds", str(timeout_seconds), "--seed", str(experiment.seeds[0]),
-        ]
+        runtime_paths: tuple[Path, ...] = ()
+        if self.runner.isolated_available:
+            # The worker is self-contained standard-library code.  Supplying
+            # it through ``-c`` lets Bubblewrap expose only the candidate
+            # worktree, the explicit public manifest, and this virtualenv.
+            runtime = Path(sys.executable).absolute().parent.parent
+            command = [
+                "/runtime/0/bin/python", "-c", worker.read_text(encoding="utf-8"),
+                "--package-root", "/workspace/algofinder", "--manifest", "/inputs/0",
+                "--timeout-seconds", str(timeout_seconds), "--seed", str(experiment.seeds[0]),
+            ]
+            runtime_paths = (runtime,)
+        else:
+            command = [
+                sys.executable, str(worker), "--package-root", str(package_root),
+                "--manifest", str(manifest),
+                "--timeout-seconds", str(timeout_seconds), "--seed", str(experiment.seeds[0]),
+            ]
         if experiment.budget_seconds is not None:
             command.extend(("--budget-seconds", str(experiment.budget_seconds)))
         for split in splits:
@@ -79,6 +88,7 @@ class PublicBenchmarkAdapter:
                     trusted_local=self.allow_trusted_local,
                 ),
                 readable_paths=(manifest,),
+                runtime_paths=runtime_paths,
             )
         except SandboxError as exc:
             raise BenchmarkAdapterError(str(exc)) from exc

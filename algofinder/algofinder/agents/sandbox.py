@@ -80,6 +80,7 @@ class SandboxRunner:
         worktree: str | Path,
         policy: SandboxPolicy,
         readable_paths: Sequence[str | Path] = (),
+        runtime_paths: Sequence[str | Path] = (),
         writable_dir: str | Path | None = None,
     ) -> SandboxResult:
         """Run a command with no ambient secrets; sealed zones require isolation.
@@ -93,12 +94,13 @@ class SandboxRunner:
         root = Path(worktree).resolve()
         self.validate_workspace(root)
         readable = [Path(path).resolve() for path in readable_paths]
+        runtimes = [Path(path).resolve() for path in runtime_paths]
         if policy.zone != "public" and not self.isolated_available:
             raise SandboxError(
                 "sealed evaluation requires Bubblewrap (bwrap); refusing unsafe host execution"
             )
         if self.isolated_available:
-            return self._run_bwrap(command, root, policy, readable, writable_dir)
+            return self._run_bwrap(command, root, policy, readable, runtimes, writable_dir)
         if not policy.trusted_local:
             raise SandboxError("no isolated backend available; enable trusted_local only for public maintainer smoke checks")
         return self._run_local(command, root, policy)
@@ -120,6 +122,7 @@ class SandboxRunner:
         root: Path,
         policy: SandboxPolicy,
         readable: Sequence[Path],
+        runtimes: Sequence[Path],
         writable_dir: str | Path | None,
     ) -> SandboxResult:
         """Minimal Bubblewrap profile: candidate source is read-only and networkless."""
@@ -130,8 +133,14 @@ class SandboxRunner:
             if path.exists():
                 args.extend(["--ro-bind", directory, directory])
         args.extend(["--ro-bind", str(root), "/workspace", "--chdir", "/workspace"])
+        if readable:
+            args.extend(["--dir", "/inputs"])
         for index, path in enumerate(readable):
             args.extend(["--ro-bind", str(path), f"/inputs/{index}"])
+        if runtimes:
+            args.extend(["--dir", "/runtime"])
+        for index, path in enumerate(runtimes):
+            args.extend(["--ro-bind", str(path), f"/runtime/{index}"])
         if writable_dir is not None:
             output = Path(writable_dir).resolve()
             output.mkdir(parents=True, exist_ok=True)
