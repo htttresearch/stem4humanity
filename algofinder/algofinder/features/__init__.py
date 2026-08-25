@@ -1,19 +1,20 @@
 """Per-instance feature sets and canonical records (phase 6).
 
 Tier-0 ``params@1`` applies to every instance; tier-1 ``etsp-geometry@1``
-applies to Euclidean TSP instances only.  Feature records follow the
+and ``etsp-geometry@2`` apply to Euclidean TSP instances only.  Feature records follow the
 spec 6.7 schema and live under ``public/data/features/``.
 """
 
 from __future__ import annotations
 
 from algofinder.features.base import FeatureSet, compute_feature_record, instance_id
-from algofinder.features.etsp_geometry import etsp_geometry_feature_set
+from algofinder.features.etsp_geometry import etsp_geometry_feature_set, etsp_geometry_v2_feature_set
 from algofinder.features.params import params_feature_set
 
 FEATURE_SETS: tuple[FeatureSet, ...] = (
     params_feature_set,
     etsp_geometry_feature_set,
+    etsp_geometry_v2_feature_set,
 )
 
 FEATURE_SET_BY_ID = {feature_set.id: feature_set for feature_set in FEATURE_SETS}

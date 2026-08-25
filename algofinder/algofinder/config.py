@@ -29,7 +29,19 @@ DEFAULT_CONFIG_PATH = CONFIG_DIR / "config.toml"
 
 MODES = ("dev", "prod")
 TRACE_PROFILES = ("full", "decisions", "summary")
-SPLITS = ("train", "test")
+# ``test`` remains supported for legacy manifests.  Compiled suites use the
+# explicit validation/IID/OOD roles below; agent campaigns bind those roles to
+# public, metered, or sealed evaluator zones in CampaignSpec rather than
+# collapsing them back into a single visible test set.
+SPLITS = (
+    "train",
+    "validation",
+    "test",
+    "test_iid",
+    "test_family_ood",
+    "test_parameter_ood",
+    "test_metric_ood",
+)
 PIPELINE_STEPS = ("generate", "train", "benchmark", "features", "index", "report")
 
 DEFAULT_PATHS = {
@@ -263,10 +275,10 @@ def resolve(
     features = _require_table(raw, "features")
     feature_sets = _take_str_list(features, "enabled")
     for feature_set in feature_sets:
-        if feature_set not in ("params@1", "etsp-geometry@1"):
+        if feature_set not in ("params@1", "etsp-geometry@1", "etsp-geometry@2"):
             raise ConfigError(
                 f"config: 'features.enabled' entries must be one of "
-                f"params@1, etsp-geometry@1, got {feature_set!r}"
+                f"params@1, etsp-geometry@1, etsp-geometry@2, got {feature_set!r}"
             )
 
     ml = _require_table(raw, "ml")

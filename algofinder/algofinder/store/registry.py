@@ -19,7 +19,12 @@ from algofinder.trace.serialize import strict_dumps
 
 SCHEMA_VERSION = "algofinder.registry.v1"
 
-KINDS = ("instances", "solvers", "runs", "environments", "features")
+CORE_KINDS = ("instances", "solvers", "runs", "environments", "features")
+CAMPAIGN_KINDS = (
+    "campaigns", "agents", "hypotheses", "candidates", "experiments",
+    "evaluations", "analyses", "decisions", "episodes", "attempts", "transitions",
+)
+KINDS = CORE_KINDS + CAMPAIGN_KINDS
 
 
 class RegistryError(ValueError):
@@ -99,6 +104,8 @@ class Registry:
 
 
 __all__ = [
+    "CAMPAIGN_KINDS",
+    "CORE_KINDS",
     "KINDS",
     "Registry",
     "RegistryError",

@@ -28,7 +28,7 @@ from algofinder.store.canonical import (
     sha256_file,
 )
 from algofinder.store.queries import _list_literal, parity_check
-from algofinder.store.registry import KINDS, Registry, write_kind
+from algofinder.store.registry import CAMPAIGN_KINDS, CORE_KINDS, Registry, write_kind
 
 
 def _load_instances(instances_dir: str | Path) -> list[dict[str, Any]]:
@@ -61,6 +61,7 @@ def _solver_entries() -> list[dict[str, Any]]:
 
     entries: list[dict[str, Any]] = []
     for solver_id, cls in sorted(all_solvers().items()):
+        instance = None
         try:
             instance = cls()
             capabilities = instance.capabilities().to_mapping()
@@ -74,6 +75,7 @@ def _solver_entries() -> list[dict[str, Any]]:
                 "applies_to": sorted(cls.applies_to),
                 "module": cls.__module__,
                 "capabilities": capabilities,
+                "manifest": instance.manifest().to_mapping() if instance is not None else None,
                 "schema_version": SCHEMA_VERSION,
             }
         )
@@ -193,7 +195,7 @@ def build_registry(
 ) -> dict[str, int]:
     """Regenerate every registry log from the canonical files."""
     counts: dict[str, int] = {}
-    for kind in KINDS:
+    for kind in CORE_KINDS:
         write_kind(registry_dir, kind, [])
         counts[kind] = 0
     for kind, entries in (
@@ -235,6 +237,8 @@ def verify_registry(
 
 def _results_glob_paths(results_dir: str | Path, results_glob: str) -> list[str]:
     return [str(path) for path in find_results_files(results_dir, results_glob)]
+
+
 def build_db(
     *,
     results_dir: str | Path,
@@ -243,6 +247,7 @@ def build_db(
     registry_dir: str | Path,
     db_path: str | Path,
     cache_dir: str | Path,
+    learning_root: str | Path | None = None,
 ) -> dict[str, int]:
     """Rebuild the DuckDB file: views over canonical files + Parquet caches."""
     db_path = Path(db_path)
@@ -307,14 +312,21 @@ def build_db(
                 "CREATE OR REPLACE VIEW v_features_cache AS "
                 "SELECT * FROM read_parquet(" + _list_literal([str(_cache(cache_dir, "features"))]) + ")"
             )
-        for kind in ("solvers", "environments"):
+        for kind in ("solvers", "environments", *CAMPAIGN_KINDS):
             _create_registry_view(con, registry, kind)
+        if learning_root is not None:
+            _create_learning_views(con, Path(learning_root))
     finally:
         con.close()
 
     counts: dict[str, int] = {}
     with duckdb.connect(str(db_path)) as con:
-        for name in ("v_runs", "v_instances", "v_references", "v_solvers", "v_environments", "v_features"):
+        for name in (
+            "v_runs", "v_instances", "v_references", "v_solvers", "v_environments",
+            "v_features", *(f"v_{kind}" for kind in CAMPAIGN_KINDS),
+            "v_distribution_profiles", "v_learning_runs", "v_agent_policies",
+            "v_agent_evaluations", "v_agent_memories", "v_learning_datasets",
+        ):
             try:
                 counts[name] = con.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
             except Exception:
@@ -346,6 +358,31 @@ def _create_registry_view(
     )
 
 
+def _create_learning_views(con: duckdb.DuckDBPyConnection, root: Path) -> None:
+    """Expose immutable learning artifacts as rebuildable DuckDB views."""
+    from algofinder.agents.learning.store import LearningArtifactStore
+
+    store = LearningArtifactStore(root)
+    sources = {
+        "distribution_profiles": root / "distributions" / "*.json",
+        "learning_runs": root / "runs" / "*.json",
+        "agent_policies": root / "policies" / "*" / "policy.json",
+        "agent_evaluations": root / "evaluations" / "*.json",
+        "agent_memories": root / "memories" / "*.json",
+        "learning_datasets": root / "datasets" / "*" / "manifest.json",
+    }
+    for name, pattern in sources.items():
+        paths = sorted(str(path) for path in root.glob(str(pattern.relative_to(root))))
+        if paths:
+            for path in paths:
+                store.read(Path(path).relative_to(root))
+            con.execute(
+                f"CREATE OR REPLACE VIEW v_{name} AS SELECT * FROM read_json_auto("
+                + _list_literal(paths)
+                + ")"
+            )
+
+
 def _cache(cache_dir: Path, name: str) -> Path:
     return cache_dir / f"{name}.parquet"
 
@@ -358,6 +395,7 @@ def index_all(
     registry_dir: str | Path,
     db_path: str | Path,
     cache_dir: str | Path,
+    learning_root: str | Path | None = None,
     parity: bool = True,
 ) -> dict[str, Any]:
     """Full index step: registry, DB, parity gate. Returns a summary."""
@@ -382,6 +420,7 @@ def index_all(
         registry_dir=registry_dir,
         db_path=db_path,
         cache_dir=cache_dir,
+        learning_root=learning_root,
     )
     summary: dict[str, Any] = {
         "registry": registry_counts,

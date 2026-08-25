@@ -20,5 +20,8 @@ dependencies = [
 numba = ["numba>=0.58"]
 dev = ["pytest"]
 
+[project.scripts]
+algofinder-data = "algofinder.data:main"
+
 [tool.setuptools.packages.find]
 include = ["algofinder*"]

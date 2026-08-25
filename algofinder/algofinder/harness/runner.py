@@ -26,6 +26,7 @@ from algofinder.config import (
     Config,
     ConfigError,
     DEFAULT_CONFIG_PATH,
+    SPLITS,
     load_config,
 )
 
@@ -115,22 +116,31 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
         _log(cfg, f"dev mode: session {session.session_id} at {session.dir}")
         _log(cfg, f"dev mode: trace profile {trace_profile}")
     instances = _load_instances(args.manifest, cfg.instances_dir)
+    splits = tuple(args.split) if getattr(args, "split", None) else cfg.splits
+    solver_include = (
+        tuple(args.solver_include) if getattr(args, "solver_include", None)
+        else cfg.solver_include
+    )
+    solver_exclude = (
+        tuple(args.solver_exclude) if getattr(args, "solver_exclude", None)
+        else cfg.solver_exclude
+    )
     _log(
         cfg,
         f"benchmarking {len(instances)} instances "
         f"(budget={args.budget_seconds}s, timeout={args.timeout_seconds}s, "
         f"seed={args.seed}, memory={args.memory_bytes} bytes, "
-        f"mode={cfg.mode}, splits={cfg.splits})",
+        f"mode={mode}, splits={splits}, include={solver_include}, exclude={solver_exclude})",
     )
     try:
         runs = run_benchmark(
             instances,
             budget_seconds=args.budget_seconds,
             timeout_seconds=args.timeout_seconds,
-            splits=cfg.splits,
+            splits=splits,
             session=session,
-            solver_include=cfg.solver_include,
-            solver_exclude=cfg.solver_exclude,
+            solver_include=solver_include,
+            solver_exclude=solver_exclude,
             seed=args.seed,
             memory_bytes=args.memory_bytes,
         )
@@ -144,8 +154,10 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
             "timeout_seconds": args.timeout_seconds,
             "seed": args.seed,
             "memory_bytes": args.memory_bytes,
-            "mode": cfg.mode,
-            "splits": list(cfg.splits),
+            "mode": mode,
+            "splits": list(splits),
+            "solver_include": list(solver_include),
+            "solver_exclude": list(solver_exclude),
             "trace_profile": trace_profile,
             "session": session.session_id if session else None,
             "manifests": [str(path) for path in _manifest_paths(args, cfg.instances_dir)],
@@ -412,6 +424,25 @@ def build_parser(cfg: Config) -> argparse.ArgumentParser:
         default=list(cfg.manifests),
         help="manifest file (repeatable; defaults to config 'manifests' "
         "or all under the instances dir)",
+    )
+    benchmark.add_argument(
+        "--split",
+        action="append",
+        choices=SPLITS,
+        default=None,
+        help="instance split to benchmark (repeatable; defaults to config 'splits')",
+    )
+    benchmark.add_argument(
+        "--solver-include",
+        action="append",
+        default=None,
+        help="solver id to include (repeatable; defaults to config selection)",
+    )
+    benchmark.add_argument(
+        "--solver-exclude",
+        action="append",
+        default=None,
+        help="solver id to exclude (repeatable; defaults to config selection)",
     )
     benchmark.add_argument(
         "--budget-seconds", type=float, default=cfg.budget_seconds,
