@@ -130,7 +130,7 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
         f"benchmarking {len(instances)} instances "
         f"(budget={args.budget_seconds}s, timeout={args.timeout_seconds}s, "
         f"seed={args.seed}, memory={args.memory_bytes} bytes, "
-        f"mode={cfg.mode}, splits={splits}, include={solver_include}, exclude={solver_exclude})",
+        f"mode={mode}, splits={splits}, include={solver_include}, exclude={solver_exclude})",
     )
     try:
         runs = run_benchmark(
@@ -154,7 +154,7 @@ def command_benchmark(args: argparse.Namespace, cfg: Config) -> None:
             "timeout_seconds": args.timeout_seconds,
             "seed": args.seed,
             "memory_bytes": args.memory_bytes,
-            "mode": cfg.mode,
+            "mode": mode,
             "splits": list(splits),
             "solver_include": list(solver_include),
             "solver_exclude": list(solver_exclude),
